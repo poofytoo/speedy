@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="js/scripts.js"></script>
+</head>
+<body>
+
+<script>
+data = {};
+
+$(function() {
+  $.getJSON('short-and-one-letter-select.json', function(data) {
+    init(data);
+  })
+  .fail(function(err) {
+    console.log( "error" , err);
+  });
+})
+
+function init(data) {
+  for (word in data) {
+    for (i in data[word]) {
+      anagramPlus = data[word][i];
+      if (anagramPlus.indexOf(word) < 1 && anagramPlus.indexOf(word) != -1) {
+        if (anagramPlus.charAt(anagramPlus.length-1) == 'y') {
+          data[word].splice(data[word].indexOf(anagramPlus), 1)
+          console.log(word, anagramPlus)
+
+        }
+      }
+    }
+  }
+
+
+  $('body').append(JSON.stringify(data));
+}
+
+
+</script>
+</body>
+</html>

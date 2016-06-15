@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="js/scripts.js"></script>
+</head>
+<body>
+
+<script>
+t = {};
+
+$(function() {
+  $.getJSON('dictionary.json', function(data) {
+    d = data;
+    $.getJSON('short-dictionary.json', function(shortList) {
+      init(shortList, d);
+    });
+  })
+  .fail(function(err) {
+    console.log( "error" , err);
+  });
+})
+
+var permArr = [],
+  usedChars = [];
+
+function permutator(inputArr) {
+  var results = [];
+
+  function permute(arr, memo) {
+    var cur, memo = memo || [];
+
+    for (var i = 0; i < arr.length; i++) {
+      cur = arr.splice(i, 1);
+      if (arr.length === 0) {
+        results.push(memo.concat(cur));
+      }
+      permute(arr.slice(), memo.concat(cur));
+      arr.splice(i, 0, cur[0]);
+    }
+
+    return results;
+  }
+
+  return permute(inputArr);
+}
+
+function init(s, d) {
+  shortListWords = Object.keys(s);
+  shortListLength = Object.keys(s).length
+  randomWord = shortListWords[Math.floor(shortListLength*Math.random())]
+  randomWordArray = randomWord.split('');
+
+  randomLetter = String.fromCharCode(Math.floor(Math.random()*26)+97);
+  randomWordArray.push(randomLetter)
+  permutations = permutator(randomWordArray)
+  for (i in permutations) {
+    newWord = permutations[i].join('');
+    if (d[newWord] == "") {
+    }
+  }
+
+  counter = 0;
+  checkWord = randomWord;
+  console.log(checkWord);
+
+  for (checkWord in s) {
+    for (dictWord in d) {
+      dictWordTemp = dictWord;
+
+      if (checkWord.length == dictWordTemp.length - 1) {
+        for (i in checkWord) {
+          c = checkWord[i]
+          indexOfLetter = dictWordTemp.indexOf(c)
+          if (indexOfLetter != -1) {
+            dictWordTemp = dictWordTemp.substr(0,indexOfLetter) + dictWordTemp.substr(indexOfLetter+1, dictWordTemp.length-1)
+          }
+        }
+
+        if (dictWordTemp.length == 1) {
+          //console.log(dictWord, dictWordTemp, 'FOUND 1')
+          // Add to the dictionary
+          if (s[checkWord].length < 1) {
+            s[checkWord] = [dictWord]
+          } else {
+            s[checkWord].push(dictWord)
+          }
+        }
+        /*
+        counter ++;
+        if (counter > 40) {
+          break;
+        }
+        */
+      }
+    }
+    // console.log(s[checkWord]);
+  }
+  console.log(s);
+  $('body').append(JSON.stringify(s));
+}
+
+
+</script>
+</body>
+</html>

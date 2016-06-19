@@ -24,11 +24,10 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
       scoreRef.set({
         score: parseInt(req.body.score),
         user: req.user
+      }, function() {
+        res.send({success: true});
       });
     }
-  })
-  scoreRef.set(parseInt(req.body.score), function() {
-    res.send({success: true});
   });
 });
 

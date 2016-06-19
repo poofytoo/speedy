@@ -12,6 +12,13 @@ router.get('/login', function(req, res, next) {
   res.render('login', {layout: 'login_layout'});
 });
 
+router.get('/logout', function(req, res) {
+  req.logout();
+  req.session.save(function() {
+    res.redirect('/');
+  });
+});
+
 router.post('/score', auth.loggedIn, function(req, res, next) {
   var scoreRef = firebaseRef.ref('scores/' + req.user.id);
 

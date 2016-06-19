@@ -9,7 +9,7 @@ router.get('/', auth.loggedIn, function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
-  res.render('login', {});
+  res.render('login', {layout: 'login_layout'});
 });
 
 router.post('/score', auth.loggedIn, function(req, res, next) {

@@ -127,7 +127,8 @@ input {
   bottom: 0;
   width: 100%;
   left: 0;
-  text-align: center; }
+  text-align: center;
+  display: none; }
   .timer-container .timer {
     display: inline-block;
     font-family: 'Open Sans', sans-serif;
@@ -161,13 +162,33 @@ input {
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  text-align: center; }
+  text-align: center;
+  display: none; }
   .mini-letter-tile.highlight {
     background-color: #FFDB92;
     box-shadow: 0px 2px 0px #E9C378; }
 
+.final-score-caption {
+  font-family: 'Open Sans', sans-serif;
+  text-transform: lowercase;
+  color: #E1DDD7;
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  text-align: left;
+  position: absolute;
+  display: none; }
+
+.final-score-container {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #666; }
+
 .highscore-container {
-  position: absolute; }
+  position: absolute;
+  display: none; }
   .highscore-container h3 {
     font-family: 'Open Sans', sans-serif;
     text-transform: uppercase;
@@ -185,5 +206,21 @@ input {
     text-align: left; }
     .highscore-container td.score {
       font-weight: 500; }
+
+.play-again {
+  font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 26px;
+  font-size: 15px;
+  border-radius: 30px;
+  background-color: #E1DDD7;
+  color: #fff;
+  position: absolute; }
+  .play-again:hover {
+    opacity: 0.8;
+    cursor: pointer; }
 
 /*# sourceMappingURL=main.css.map */

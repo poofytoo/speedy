@@ -161,6 +161,7 @@ input {
   width: 100%;
   left: 0;
   text-align: center;
+  display: none;
 
   .timer {
     display: inline-block;
@@ -199,6 +200,7 @@ input {
   font-size: 12px;
   font-weight: 700;
   text-align: center;
+  display: none;
 
   &.highlight {
     background-color: #FFDB92;
@@ -206,8 +208,29 @@ input {
   }
 }
 
+.final-score-caption {
+  font-family: 'Open Sans', sans-serif;
+  text-transform: lowercase;
+  color: #E1DDD7;
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  text-align: left;
+  position: absolute;
+  display: none;
+}
+
+.final-score-container {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #666;
+}
+
 .highscore-container {
   position: absolute;
+  display: none;
   
   h3 {
     font-family: 'Open Sans', sans-serif;
@@ -230,5 +253,24 @@ input {
     padding-right: 8px;
     color: #666;
     text-align: left;
+  }
+}
+
+.play-again {
+  font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 26px;
+  font-size: 15px;
+  border-radius: 30px;
+  background-color: #E1DDD7;
+  color: #fff;
+  position: absolute;
+
+  &:hover {
+    opacity: 0.8;
+    cursor: pointer;
   }
 }

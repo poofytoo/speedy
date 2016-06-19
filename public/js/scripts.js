@@ -1,23 +1,28 @@
-
 var data = {};
 var seed;
 
-var wordSetCounter = 0;
-var wordSet = [];
-
-var playerPlacematStack = [];
-var tileTracker = {};
 var numberOfWords = 20;
 var numEasyWords = 10;
-var countdownTime = 400;
-var fullDictionary = {}
+
+var wordDictionaryAll;
+var wordDictionarySelect;
+
+var wordSetCounter = 0;
+var wordSet = [];
+var playerPlacematStack = [];
+var tileTracker = {};
 var solvedWords = [];
 var gameTimer;
+var gameTimerCount = 0;
+
+var fullDictionary = {}
 
 var gameState = 'ENTER_NAME';
 
+const TOTAL_WORDS_IN_SET = 20;
+const COUNTDOWN_TIME = 400;
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 30;
+const GAME_TIME_LENGTH = 3;
 
 $(function() {
 
@@ -36,6 +41,13 @@ $(function() {
     });
   });
 
+  $(document).on('click', '.play-again', function(e) {
+    console.log('play again');
+    if (gameState == 'GAME_ENDED') {
+      resetGame();
+    }
+  })
+
   $(document).bind('keydown', function(e) {
     if(e.which == 13) {
       if (gameState == 'ENTER_NAME') {
@@ -44,10 +56,8 @@ $(function() {
           opacity: 0
         }, 600, 'easeInBack', function() {
           $('.enter-name-container').hide();
-          $('.countdown-container').fadeIn();
-          animateCountdown();
+          showCountdown();
         });
-        gameState = 'COUNTDOWN';
       }
     }
     if (gameState == 'IN_GAME') {
@@ -61,22 +71,56 @@ $(function() {
     }
   });
 
+  function showCountdown() {
+    gameState = 'COUNTDOWN';
+    $('.countdown-container').fadeIn();
+    animateCountdown();
+  }
+
   function animateCountdown() {
     setTimeout(function() {
       $('.countdown-3').addClass('countdown-transition')
-    }, countdownTime)
+    }, COUNTDOWN_TIME)
     setTimeout(function() {
       $('.countdown-2').addClass('countdown-transition')
-    }, countdownTime*2)
+    }, COUNTDOWN_TIME*2)
     setTimeout(function() {
       $('.countdown-1').addClass('countdown-transition')
-      startGame();
-    }, countdownTime*3)
+      setTimeout(function() {
+        $('.countdown-container').hide();
+        startGame();
+      }, COUNTDOWN_TIME)
+    }, COUNTDOWN_TIME*3)
+  }
+
+  function resetGame() {
+    wordSetCounter = 0;
+    wordSet = [];
+    playerPlacematStack = [];
+    tileTracker = {};
+    solvedWords = [];
+    gameTimer;
+    gameTimerCount = 0;
+
+    $('.countdown-1').removeClass('countdown-transition')
+    $('.countdown-2').removeClass('countdown-transition')
+    $('.countdown-3').removeClass('countdown-transition')
+
+    seed = generateSeed();
+    generateWordList(seed);
+
+    if (gameState == 'GAME_ENDED') {
+      $('.game-container *').fadeOut();
+      setTimeout(function() {
+        $('.game-container *').remove();
+        $('.game-container').hide();
+        showCountdown();
+      }, 400)
+    }
   }
 
   function startGame() {
     solvedWords = [];
-
     animateTilesEnter(wordSet[0][0], wordSet[0][1]);
     gameTimerCount = GAME_TIME_LENGTH
     $('.timer').text(gameTimerCount);
@@ -87,6 +131,7 @@ $(function() {
   }
 
   function endGame() {
+    $('.cover').show();
     $('.cover').css({
       width: 0,
       height: 0,
@@ -103,7 +148,7 @@ $(function() {
       clearTileBoard();
       $('.timer-container').hide();
       showHighScore();
-      $('.cover').remove();
+      $('.cover').hide();
     })
   }
 
@@ -116,6 +161,7 @@ $(function() {
   }
 
   function showHighScore() {
+    console.log('solvedwords', solvedWords);
     var longestLength = 0;
     var score = 0;
 
@@ -137,14 +183,20 @@ $(function() {
       }
 
       singleLetterFound = false;
+
       for (j in wordRound[2]) {
         letter = wordRound[2][j];
-        $letter = $('<div id="mini-sol-'+i+'-'+j+'" class="mini-letter-tile">'+letter+'</div>');
+        $letter = $('<div class="mini-letter-tile">'+letter+'</div>');
         $letter.css({
           top: i*30,
           left: j*25 + (longestLength+1)*25
         })
-        score ++;
+
+        // the first two letters don't get scored
+        if (j > 1) {
+          $letter.attr('id', 'scoring-' + score)
+          score ++;
+        }
 
         // look for the single letter to highlight
         if (letter == wordRound[1] && !singleLetterFound) {
@@ -155,10 +207,48 @@ $(function() {
         $('.game-container').append($letter);
       }
     }
-    console.log('ok now for highscores');
+
+    function blinkScoreTile(countUp) {
+      $('#scoring-' + countUp).animate({
+        opacity: 0
+      }, 100, function() {
+        $(this).animate({
+          opacity: 1
+        }, 100)
+      });
+      $('.final-score-container').text(countUp);
+      if (countUp < score) {
+        countUp ++;
+        setTimeout(function() {
+          blinkScoreTile(countUp)
+        }, 100)
+      }
+    }
+
+    $('.mini-letter-tile').fadeIn()
+    setTimeout(function() {
+      blinkScoreTile(0)
+    }, 500)
+
+    $fsc = $('<div class="final-score-caption">final score: <span class="final-score-container">0</span></div>');
+    $fsc.css({
+      top: solvedWords.length * 30+20,
+      left: 0
+    })
+    $fsc.find('.final-score-container').text('0')
+    $fsc.fadeIn();
+    $('.game-container').append($fsc);
+
+    $playAgainBtn = $('<div class="play-again">play again</div>').hide();
+    $playAgainBtn.css ({
+      top: solvedWords.length * 30+68,
+      left: -5
+    })
+    $('.game-container').append($playAgainBtn);
+    $playAgainBtn.fadeIn();
 
     $highscore = $('<div class="highscore-container"></div>');
-    $highscore.append('<h3>highscore</h3>');
+    $highscore.append('<h3>highscores</h3>');
     $highscoreTable = $('<table></table>')
 
     $.post('/score', {score: score, seed: seed}, function() {  
@@ -172,10 +262,11 @@ $(function() {
         $highscore.append($highscoreTable);
         console.log('ADDING SIR ')
         $('.game-container').append($highscore);
-      })
-      $highscore.css({
-        top: 0,
-        left: (longestLength * 2 + 4) * 25
+        $highscore.css({
+          top: 0,
+          left: Math.max((longestLength * 2 + 4) * 25, 250),
+        })
+        $highscore.fadeIn(300);
       })
     })
   }
@@ -184,6 +275,7 @@ $(function() {
     gameTimerCount --;
     if (gameTimerCount < 0) {
       gameTimerCount = 0;
+      console.log('ENDING GAME NOW', gameState)
       endGame();
       clearInterval(gameTimer);
     } else {
@@ -269,7 +361,7 @@ $(function() {
         backgroundColor: '#6FD06C',
       }, 100);
       setTimeout(function() {
-        $.each($('.game-container span'), function() {
+        $.each($('.game-container .letter-tile'), function() {
           scatterOut($(this));
         });
         $('.game-container .wordbank-placemat').fadeOut();
@@ -313,6 +405,8 @@ $(function() {
 
   function animateTilesEnter(letters, plusLetter) {
     lettersArr = letters.split('')
+
+    $('.timer-container').fadeIn();
 
     for (i = 0; i < lettersArr.length+1; i ++) {
       playerPlacematX = gameWidth / 2 - ((lettersArr.length+1) * (placematWidth+placematSpacing) - placematSpacing)/2 + i * (placematWidth+placematSpacing)
@@ -358,6 +452,7 @@ $(function() {
     $('.game-container').append($plusTile);
 
     $('.game-container').show();
+
     /*
     for (i = 0; i < lettersArr.length+1; i ++) {
       $('.placemat-container').append($('<span id="l'+i+'" class="tile-placemat"></span>'))
@@ -425,53 +520,66 @@ $(function() {
   console.log(test);
   */
 
-  function init() {
 
-    generateDictionary(function(dSelect, dAll) {
-      wordList = Object.keys(dSelect);
-      allWordList = Object.keys(dAll);
-      seed = generateSeed();
-      console.log('seed: ', seed)
-      // seed = 5;
-      numEasyWordsCounter = 0;
+  function generateWordList(seed) {
+    random = randomSeed(seed);
+    numberOfWords = TOTAL_WORDS_IN_SET;
 
-      random = randomSeed(seed);
+    numEasyWordsCounter = 0;
+    startingIndex = Math.floor(wordList.length * random)
+    for (i = 0; i < numberOfWords; i ++) {
 
-      startingIndex = Math.floor(wordList.length * random)
-      for (i = 0; i < numberOfWords; i ++) {
+      randomIndex = Math.floor(wordList.length*randomSeed(seed*(i+1)))
+      wordProbe = wordList[randomIndex];
 
-        randomIndex = Math.floor(wordList.length*randomSeed(seed*(i+1)))
-        wordProbe = wordList[randomIndex];
+      if (wordSet.indexOf(wordProbe) < 0) {
+        wordPlusIndex = Math.floor(wordDictionarySelect[wordProbe].length*randomSeed(seed/(i+1)))
+        wordPlus = wordDictionarySelect[wordProbe][wordPlusIndex];
+        if (allWordList.indexOf(wordPlus) > -1) {
 
-        if (wordSet.indexOf(wordProbe) < 0) {
-          wordPlusIndex = Math.floor(dSelect[wordProbe].length*randomSeed(seed/(i+1)))
-          wordPlus = dSelect[wordProbe][wordPlusIndex];
-          if (allWordList.indexOf(wordPlus) > -1) {
-
-            letter = getLetterDifference(wordList[randomIndex], wordPlus)
-            console.log(wordList[randomIndex], letter, wordPlus)
-            wordSet.push([wordList[randomIndex], letter, wordPlus]);
-          } else {
-            // ensuring there is at least one word in the easy set
-            // word not in 'easy' set
-            if (numberOfWords < MAX_SEARCH) {
-              numberOfWords += 1;
-            }
-          }
+          letter = getLetterDifference(wordList[randomIndex], wordPlus)
+          console.log(wordList[randomIndex], letter, wordPlus)
+          wordSet.push([wordList[randomIndex], letter, wordPlus]);
         } else {
-          // word not in set
+          // ensuring there is at least one word in the easy set
+          // word not in 'easy' set
           if (numberOfWords < MAX_SEARCH) {
             numberOfWords += 1;
           }
         }
+      } else {
+        // word not in set
+        if (numberOfWords < MAX_SEARCH) {
+          numberOfWords += 1;
+        }
       }
+    }
+  }
+
+  function init() {
+    generateDictionary(function(dSelect, dAll) {
+      // Selected 'good words'
+      // AllWordList: all valid words in the scrabble dictionary
+      wordDictionarySelect = dSelect;
+      wordDictionaryAll = dAll
+
+      wordList = Object.keys(dSelect);
+      allWordList = Object.keys(dAll);
+
+      seed = generateSeed();
+
+      console.log('seed: ', seed)
+      // seed = 5;
+      generateWordList(seed);
 
       // console.log(wordSet, wordSet.length);
 
       // for testing
 
+/*
       $('.enter-name-container').hide();
       startGame();
+      */
       /*
       gameState = 'IN_GAME';
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);

@@ -11,12 +11,13 @@ var numberOfWords = 20;
 var numEasyWords = 10;
 var countdownTime = 400;
 var fullDictionary = {}
+var solvedWords = [];
 var gameTimer;
 
 var gameState = 'ENTER_NAME';
 
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 1;
+const GAME_TIME_LENGTH = 5;
 
 $(function() {
 
@@ -74,6 +75,8 @@ $(function() {
   }
 
   function startGame() {
+    solvedWords = [];
+
     animateTilesEnter(wordSet[0][0], wordSet[0][1]);
     gameTimerCount = GAME_TIME_LENGTH
     $('.timer').text(gameTimerCount);
@@ -95,11 +98,76 @@ $(function() {
       height: "2000px",
       bottom: "-1000px",
       backgroundColor: "#fff"
-    }, 700, "easeInOutQuad", function() {
-      $('.game-container div').remove();
-      $('.game-container span').remove();
+    }, 1000, "easeInOutQuad", function() {
+      gameState = 'GAME_ENDED';
+      clearTileBoard();
       $('.timer-container').hide();
+      showHighScore();
       $('.cover').remove();
+    })
+  }
+
+  function clearTileBoard() {
+    $('.game-container .letter-tile').remove();
+    $('.game-container .wordbank-placemat').remove();
+    $('.game-container .player-placemat').remove();
+    $('.game-container .hint-container').remove();
+    $('.game-container .plus-tile-placemat').remove();
+  }
+
+  function showHighScore() {
+    var longestLength = 0;
+    for (i in solvedWords) {
+      longestLength = Math.max(solvedWords[i][0].length, longestLength);
+    }
+
+    for (i in solvedWords) {
+      wordRound = solvedWords[i];
+      
+      for (j in wordRound[0]) {
+        letter = wordRound[0][j];
+        $letter = $('<div id="mini-'+i+'-'+j+'" class="mini-letter-tile">'+letter+'</div>');
+        $letter.css({
+          top: i*30,
+          left: j*25
+        })
+        $('.game-container').append($letter);
+      }
+
+      singleLetterFound = false;
+      for (j in wordRound[2]) {
+        letter = wordRound[2][j];
+        $letter = $('<div id="mini-sol-'+i+'-'+j+'" class="mini-letter-tile">'+letter+'</div>');
+        $letter.css({
+          top: i*30,
+          left: j*25 + (longestLength+1)*25
+        })
+
+        // look for the single letter to highlight
+        if (letter == wordRound[1] && !singleLetterFound) {
+          singleLetterFound = true;
+          $letter.addClass('highlight')
+        }
+
+        $('.game-container').append($letter);
+      }
+    }
+
+    $highscore = $('<div class="highscore-container"></div>');
+    $highscore.append('<h3>highscore</h3>');
+    $highscoreTable = $('<table></table>')
+    $.get('/scores', function(data) {
+      for (i in data) {
+        row = data[i];
+        rowHTML = '<tr><td class="score">' + row.score + '</td><td>' + row.user.name + '</td></tr>';
+        $highscoreTable.append(rowHTML)
+      }
+      $highscore.append($highscoreTable);
+      $('.game-container').append($highscore);
+    })
+    $highscore.css({
+      top: 0,
+      left: (longestLength * 2 + 1) * 25
     })
   }
 
@@ -107,7 +175,6 @@ $(function() {
     gameTimerCount --;
     if (gameTimerCount < 0) {
       gameTimerCount = 0;
-      gameState = 'GAME_ENDED';
       endGame();
       clearInterval(gameTimer);
     } else {
@@ -196,13 +263,21 @@ $(function() {
         $.each($('.game-container span'), function() {
           scatterOut($(this));
         });
-        $('.game-container div').fadeOut(function() {
-          $('.game-container div').remove();
-          $('.game-container span').remove();
+        $('.game-container .wordbank-placemat').fadeOut();
+        $('.game-container .player-placemat').fadeOut();
+        $('.game-container .hint-container').fadeOut();
+        $('.game-container .plus-tile-placemat').fadeOut();
+        setTimeout(function() {  
+          clearTileBoard();
           resetAndLoadNew();
-        });
+        }, 400)
       }, 400)
       console.log('VALID!')
+      solvedWords.push([
+        wordSet[wordSetCounter][0],
+        wordSet[wordSetCounter][1],
+        userWord
+      ])
       wordSetCounter ++;
       secondsSinceLastSolve = 0;
     }
@@ -211,7 +286,9 @@ $(function() {
   function resetAndLoadNew() {
     tileTracker = {};
     playerPlacematStack = [];
-    animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);
+    if (gameState == 'IN_GAME') {
+      animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);
+    }
   }
 
   function removeLastLetter() {

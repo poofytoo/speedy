@@ -17,7 +17,7 @@ var gameTimer;
 var gameState = 'ENTER_NAME';
 
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 5;
+const GAME_TIME_LENGTH = 30;
 
 $(function() {
 
@@ -117,6 +117,8 @@ $(function() {
 
   function showHighScore() {
     var longestLength = 0;
+    var score = 0;
+
     for (i in solvedWords) {
       longestLength = Math.max(solvedWords[i][0].length, longestLength);
     }
@@ -142,6 +144,7 @@ $(function() {
           top: i*30,
           left: j*25 + (longestLength+1)*25
         })
+        score ++;
 
         // look for the single letter to highlight
         if (letter == wordRound[1] && !singleLetterFound) {
@@ -152,22 +155,28 @@ $(function() {
         $('.game-container').append($letter);
       }
     }
+    console.log('ok now for highscores');
 
     $highscore = $('<div class="highscore-container"></div>');
     $highscore.append('<h3>highscore</h3>');
     $highscoreTable = $('<table></table>')
-    $.get('/scores', function(data) {
-      for (i in data) {
-        row = data[i];
-        rowHTML = '<tr><td class="score">' + row.score + '</td><td>' + row.user.name + '</td></tr>';
-        $highscoreTable.append(rowHTML)
-      }
-      $highscore.append($highscoreTable);
-      $('.game-container').append($highscore);
-    })
-    $highscore.css({
-      top: 0,
-      left: (longestLength * 2 + 1) * 25
+
+    $.post('/score', {score: score, seed: seed}, function() {  
+      $.get('/scores', function(data) {
+        console.log(data.scores);
+        for (i in data.scores) {
+          row = data.scores[i];
+          rowHTML = '<tr><td class="score">' + row.score + '</td><td>' + row.user.firstName + ' '  + row.user.lastInitial + '.</td></tr>';
+          $highscoreTable.append(rowHTML)
+        }
+        $highscore.append($highscoreTable);
+        console.log('ADDING SIR ')
+        $('.game-container').append($highscore);
+      })
+      $highscore.css({
+        top: 0,
+        left: (longestLength * 2 + 4) * 25
+      })
     })
   }
 

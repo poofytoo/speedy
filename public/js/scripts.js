@@ -27,6 +27,7 @@ $(function() {
   var tileSpacing = 10;
   var placematWidth = 90;
   var placematSpacing = 10;
+  var secondsSinceLastSolve = 0;
 
   $(document).bind('keydown', function(e) {
     if(e.which == 13) {
@@ -48,9 +49,7 @@ $(function() {
         moveLetterToPlayerPlacemat(char);
       } else {
         e.preventDefault();
-        if (playerPlacematStack.length > 0) {
-          removeLastLetter()
-        }
+        removeLastLetter();
       }
     }
   });
@@ -64,18 +63,57 @@ $(function() {
     }, countdownTime*2)
     setTimeout(function() {
       $('.countdown-1').addClass('countdown-transition')
-      animateTilesEnter(wordSet[0][0], wordSet[0][1]);
-      gameTimerCount = GAME_TIME_LENGTH
-      gameTimer.setInterval(function() {
-        gameTimerCountdown();
-      }, 1000);
-      gameState = 'IN_GAME'
+      startGame();
     }, countdownTime*3)
+  }
+
+  function startGame() {
+    animateTilesEnter(wordSet[0][0], wordSet[0][1]);
+    gameTimerCount = GAME_TIME_LENGTH
+    $('.timer').text(gameTimerCount);
+    gameTimer = setInterval(function() {
+      gameTimerCountdown();
+    }, 1000);
+    gameState = 'IN_GAME'
   }
 
   function gameTimerCountdown() {
     gameTimerCount --;
+    secondsSinceLastSolve ++;
+    checkSecondsSinceLastSolve();
+    $('.timer').text(gameTimerCount);
+  }
 
+  function checkSecondsSinceLastSolve() {
+    if (secondsSinceLastSolve == 4) {// Object.keys(tileTracker).length) {
+      solution = wordSet[wordSetCounter][2]
+      if (playerPlacematStack[0] == undefined) {
+        // if no word currently on the placemat, easy, move a word there
+        moveLetterToPlayerPlacemat(solution.substr(0,1))
+      } else {
+        // currently there are tiles on the placemat
+        // loop through to find letter that doesn't belong
+        letterCheck = 0;
+        while (playerPlacematStack[letterCheck].t == solution.substr(letterCheck, 1)) {
+
+          console.log(solution.substr(letterCheck, 1));
+          letterCheck ++;
+          if (playerPlacematStack[letterCheck] == undefined) {
+            break;
+          }
+        }
+        lettersToRemove = (Object.keys(playerPlacematStack).length - letterCheck)
+        i = 0;
+        for (i = 0; i < lettersToRemove; i++) {
+          setTimeout(function() {
+            removeLastLetter();
+          }, 50*i);
+        }
+        setTimeout(function() {
+          moveLetterToPlayerPlacemat(solution.substr(letterCheck, 1));
+        }, 50*i + 50)
+      }
+    }
   }
 
   function generateLetterTile(letter, top, left, j) {
@@ -146,6 +184,7 @@ $(function() {
       }, 400)
       console.log('VALID!')
       wordSetCounter ++;
+      secondsSinceLastSolve = 0;
     }
   }
 
@@ -156,12 +195,14 @@ $(function() {
   }
 
   function removeLastLetter() {
-    removeChar = playerPlacematStack.pop();
-    tileTracker[removeChar.id].l = 'BANK';
-    $('#t' + removeChar.id).animate({
-      left: removeChar.sx,
-      top: removeChar.sy,
-    }, 100)
+    if (playerPlacematStack.length > 0) {
+      removeChar = playerPlacematStack.pop();
+      tileTracker[removeChar.id].l = 'BANK';
+      $('#t' + removeChar.id).animate({
+        left: removeChar.sx,
+        top: removeChar.sy,
+      }, 100)
+    }
   }
 
   function animateTilesEnter(letters, plusLetter) {
@@ -319,13 +360,16 @@ $(function() {
         }
       }
 
-      console.log(wordSet, wordSet.length);
+      // console.log(wordSet, wordSet.length);
 
       // for testing
 
       $('.enter-name-container').hide();
+      startGame();
+      /*
       gameState = 'IN_GAME';
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);
+      */
 
     })
   }

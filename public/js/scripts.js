@@ -29,6 +29,12 @@ $(function() {
   var placematSpacing = 10;
   var secondsSinceLastSolve = 0;
 
+  $(".test-score").click(function() {
+    $.post("/score", { score: 30 }, function(response) {
+      console.log(response);
+    });
+  });
+
   $(document).bind('keydown', function(e) {
     if(e.which == 13) {
       if (gameState == 'ENTER_NAME') {
@@ -127,7 +133,7 @@ $(function() {
         $('.game-container').append($hint);
         $hint.fadeIn(300);
       }
-    } 
+    }
   }
 
   function generateLetterTile(letter, top, left, j) {

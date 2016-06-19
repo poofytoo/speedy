@@ -2,19 +2,17 @@ var firebaseRef = require('./firebase');
 
 module.exports = {
   facebookLogin: function(accessToken, refreshToken, profile, done) {
-    console.log(profile);
     var userData = {
       id: profile.id,
-      name: profile.displayName
+      name: profile.displayName,
+      firstName: profile.displayName.split(" ")[0],
+      lastInitial: profile.displayName.split(" ")[1].substring(0, 1)
     };
 
     firebaseRef.ref('users/' + profile.id).once("value", function(snapshot) {
-      console.log("here");
       var user = snapshot.val();
-      console.log("user", user);
       if (user == null) {
         firebaseRef.ref('users').child(profile.id).set(userData, function(error) {
-          console.log("hm");
           if (error) {
             console.error("Error creating user:", error);
           } else {
@@ -29,7 +27,6 @@ module.exports = {
     });
   },
   serializeUser: function(user, done) {
-    console.log(user);
     return done(null, user.id);
   },
 

@@ -13,19 +13,39 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/score', auth.loggedIn, function(req, res, next) {
-  var scoreRef = firebaseRef.ref('scores');
-  scoreRef.push({
-    user: req.user,
-    score: req.body.score
-  });
+  var scoreRef = firebaseRef.ref('scores/' + req.user.id);
 
-  res.send({success: true});
+  scoreRef.on("value", function(snapshot) {
+    if (snapshot.val() != null && parseInt(req.body.score) > snapshot.val().score) {
+      scoreRef.child("score").set(parseInt(req.body.score), function() {
+        res.send({success: true});
+      })
+    } else if (snapshot.val() == null) {
+      scoreRef.set({
+        score: parseInt(req.body.score),
+        user: req.user
+      });
+    }
+  })
+  scoreRef.set(parseInt(req.body.score), function() {
+    res.send({success: true});
+  });
 });
 
 router.get('/scores', function(req, res, next) {
   var scoreRef = firebaseRef.ref('scores');
-  scoreRef.orderByChild("score").on("value", function(snapshot) {
-    res.send({scores: snapshot.val().reverse()});
+  var sent = false;
+  scoreRef.on("value", function(scoreSnapshot) {
+    scoreRef.orderByChild("score").on("value", function(snapshot) {
+      if (!sent) {
+        sent = true;
+        var scores = [];
+        snapshot.forEach(function(data) {
+          scores.push(data.val())
+        });
+        res.send({scores: scores.reverse()});
+      }
+    });
   });
 });
 

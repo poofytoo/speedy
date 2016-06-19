@@ -141,3 +141,20 @@ input {
   width: 240px;
   font-size: 26px;
 }
+
+.timer-container {
+  height: 100px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  text-align: center;
+
+  .timer {
+    display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: #eee;
+  }
+}

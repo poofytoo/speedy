@@ -11,10 +11,12 @@ var numberOfWords = 20;
 var numEasyWords = 10;
 var countdownTime = 400;
 var fullDictionary = {}
+var gameTimer;
 
 var gameState = 'ENTER_NAME';
 
 const MAX_SEARCH = 1000;
+const GAME_TIME_LENGTH = 30;
 
 $(function() {
 
@@ -63,8 +65,17 @@ $(function() {
     setTimeout(function() {
       $('.countdown-1').addClass('countdown-transition')
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);
+      gameTimerCount = GAME_TIME_LENGTH
+      gameTimer.setInterval(function() {
+        gameTimerCountdown();
+      }, 1000);
       gameState = 'IN_GAME'
     }, countdownTime*3)
+  }
+
+  function gameTimerCountdown() {
+    gameTimerCount --;
+    
   }
 
   function generateLetterTile(letter, top, left, j) {
@@ -268,6 +279,7 @@ $(function() {
   */
 
   function init() {
+
     generateDictionary(function(dSelect, dAll) {
       wordList = Object.keys(dSelect);
       allWordList = Object.keys(dAll);
@@ -315,7 +327,6 @@ $(function() {
       gameState = 'IN_GAME';
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);
       
-
     })
   }
 

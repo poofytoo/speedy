@@ -16,7 +16,7 @@ var gameTimer;
 var gameState = 'ENTER_NAME';
 
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 30;
+const GAME_TIME_LENGTH = 1;
 
 $(function() {
 
@@ -77,43 +77,57 @@ $(function() {
     gameState = 'IN_GAME'
   }
 
+  function endGame() {
+    $('.cover').css({
+      width: 0,
+      height: 0,
+      bottom: 70,
+      backgroundColor: '#CCC7BF'
+    })
+    $('.cover').animate({
+      width: "2000px",
+      height: "2000px",
+      bottom: "-1000px",
+      backgroundColor: "#fff"
+    }, 700, "easeInOutQuad", function() {
+      $('.game-container div').remove();
+      $('.game-container span').remove();
+      $('.timer-container').hide();
+      $('.cover').remove();
+    })
+  }
+
   function gameTimerCountdown() {
     gameTimerCount --;
-    secondsSinceLastSolve ++;
-    checkSecondsSinceLastSolve();
-    $('.timer').text(gameTimerCount);
+    if (gameTimerCount < 0) {
+      gameTimerCount = 0;
+      gameState = 'GAME_ENDED';
+      endGame();
+      clearInterval(gameTimer);
+    } else {
+      secondsSinceLastSolve ++;
+      checkSecondsSinceLastSolve();
+      $('.timer').text(gameTimerCount);
+    }
   }
 
   function checkSecondsSinceLastSolve() {
-    if (secondsSinceLastSolve == 4) {// Object.keys(tileTracker).length) {
-      solution = wordSet[wordSetCounter][2]
-      if (playerPlacematStack[0] == undefined) {
-        // if no word currently on the placemat, easy, move a word there
-        moveLetterToPlayerPlacemat(solution.substr(0,1))
-      } else {
-        // currently there are tiles on the placemat
-        // loop through to find letter that doesn't belong
-        letterCheck = 0;
-        while (playerPlacematStack[letterCheck].t == solution.substr(letterCheck, 1)) {
-
-          console.log(solution.substr(letterCheck, 1));
-          letterCheck ++;
-          if (playerPlacematStack[letterCheck] == undefined) {
-            break;
-          }
-        }
-        lettersToRemove = (Object.keys(playerPlacematStack).length - letterCheck)
-        i = 0;
-        for (i = 0; i < lettersToRemove; i++) {
-          setTimeout(function() {
-            removeLastLetter();
-          }, 50*i);
-        }
-        setTimeout(function() {
-          moveLetterToPlayerPlacemat(solution.substr(letterCheck, 1));
-        }, 50*i + 50)
+    solution = wordSet[wordSetCounter][2]
+    for (i = 0; i < solution.length; i ++) {
+      if (secondsSinceLastSolve == i*3 + 6) {// Object.keys(tileTracker).length) {
+        hintLetter = solution.substr(i,1);
+        rLeft = $('#pp' + i).position().left;
+        rTop = $('#pp' + i).position().top + tileHeight + 10;
+        $hint = $('<div class="hint-container">'+hintLetter+'</div>')
+        $hint.css({
+          left: rLeft,
+          top: rTop,
+          display: 'none'
+        })
+        $('.game-container').append($hint);
+        $hint.fadeIn(300);
       }
-    }
+    } 
   }
 
   function generateLetterTile(letter, top, left, j) {

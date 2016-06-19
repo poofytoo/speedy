@@ -44,6 +44,29 @@ h2 {
     display: none;
   }
 
+  .score-name-container {
+    &.hidden {
+      visibility: hidden;
+    }
+
+    h3, .score {
+      display: inline-block;
+      font-size: 18px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      margin-right: 5px;
+      color: #4C4A46;
+    }
+
+    .score {
+      color: #6FD06C;
+    }
+  }
+
   .game-container {
     position: relative;
     width: 800px;
@@ -63,7 +86,7 @@ h2 {
 
     .letter-tile {
       position: absolute;
-      background-color: #EBE8E2; 
+      background-color: #EBE8E2;
       color: #423F3B;
       display: inline-block;
       width: 80px;

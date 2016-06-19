@@ -16,6 +16,37 @@ var gameState = 'ENTER_NAME';
 
 const MAX_SEARCH = 1000;
 
+var scores = {
+  A: 1,
+  B: 3,
+  C: 3,
+  D: 2,
+  E: 1,
+  F: 4,
+  G: 2,
+  H: 4,
+  I: 1,
+  K: 8,
+  L: 1,
+  M: 3,
+  N: 1,
+  O: 1,
+  P: 3,
+  Q: 10,
+  R: 1,
+  S: 1,
+  T: 1,
+  U: 1,
+  V: 4,
+  W: 4,
+  X: 8,
+  Y: 4,
+  Z: 10
+}
+
+var playerScore = 0;
+var playerName = null;
+
 $(function() {
 
   var gameWidth = $('.game-container').width();
@@ -29,6 +60,7 @@ $(function() {
   $(document).bind('keydown', function(e) {
     if(e.which == 13) {
       if (gameState == 'ENTER_NAME') {
+        playerName = $(".player-name-input").val();
         $('.enter-name-container').animate({
           top: "-100",
           opacity: 0
@@ -63,6 +95,9 @@ $(function() {
     setTimeout(function() {
       $('.countdown-1').addClass('countdown-transition')
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);
+      $(".score-name-container .player-name").text(playerName);
+      $(".score-name-container").removeClass("hidden");
+      $('.countdown-container').hide();
       gameState = 'IN_GAME'
     }, countdownTime*3)
   }
@@ -85,7 +120,7 @@ $(function() {
   }
 
   function moveLetterToPlayerPlacemat(letter) {
-    
+
     placematPosition = $('#pp' + playerPlacematStack.length).position();
     for (i in tileTracker) {
       if (tileTracker[i].t == letter && tileTracker[i].l == 'BANK') {
@@ -130,10 +165,17 @@ $(function() {
         $('.game-container div').fadeOut(function() {
           $('.game-container div').remove();
           $('.game-container span').remove();
-          resetAndLoadNew();  
+          resetAndLoadNew();
         });
-      }, 400)
-      console.log('VALID!')
+      }, 400);
+
+      var wordScore = 0;
+      for (var i = 0; i < userWord.length; i++) {
+        wordScore += scores[userWord[i].toUpperCase()];
+      }
+      playerScore += wordScore;
+      $(".score").text(playerScore);
+      console.log('VALID!');
       wordSetCounter ++;
     }
   }
@@ -141,7 +183,7 @@ $(function() {
   function resetAndLoadNew() {
     tileTracker = {};
     playerPlacematStack = [];
-    animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);    
+    animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);
   }
 
   function removeLastLetter() {
@@ -252,11 +294,11 @@ $(function() {
     return x - Math.floor(x);
   }
 
-  /* 
+  /*
   Seed Random Tester
   test = {}
   for (i = 0; i < 100000; i ++) {
-    
+
     a = Math.floor(randomSeed(seed)*100);
     if (test[a]) {
       test[a] ++;
@@ -310,11 +352,11 @@ $(function() {
       console.log(wordSet, wordSet.length);
 
       // for testing
-      
-      $('.enter-name-container').hide();
-      gameState = 'IN_GAME';
-      animateTilesEnter(wordSet[0][0], wordSet[0][1]);
-      
+
+      // $('.enter-name-container').hide();
+      // gameState = 'IN_GAME';
+      // animateTilesEnter(wordSet[0][0], wordSet[0][1]);
+
 
     })
   }

@@ -75,7 +75,7 @@ $(function() {
 
   function gameTimerCountdown() {
     gameTimerCount --;
-    
+
   }
 
   function generateLetterTile(letter, top, left, j) {
@@ -96,7 +96,7 @@ $(function() {
   }
 
   function moveLetterToPlayerPlacemat(letter) {
-    
+
     placematPosition = $('#pp' + playerPlacematStack.length).position();
     for (i in tileTracker) {
       if (tileTracker[i].t == letter && tileTracker[i].l == 'BANK') {
@@ -141,7 +141,7 @@ $(function() {
         $('.game-container div').fadeOut(function() {
           $('.game-container div').remove();
           $('.game-container span').remove();
-          resetAndLoadNew();  
+          resetAndLoadNew();
         });
       }, 400)
       console.log('VALID!')
@@ -152,7 +152,7 @@ $(function() {
   function resetAndLoadNew() {
     tileTracker = {};
     playerPlacematStack = [];
-    animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);    
+    animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);
   }
 
   function removeLastLetter() {
@@ -237,12 +237,12 @@ $(function() {
   }
 
   function generateDictionary(callback) {
-    $.getJSON('dictionary.json', function(data) {
+    $.getJSON('/data/dictionary.json', function(data) {
       fullDictionary = data;
     });
 
-    $.getJSON('short-and-one-letter-select.json', function(select) {
-      $.getJSON('short-and-one-letter.json', function(all) {
+    $.getJSON('/data/short-and-one-letter-select.json', function(select) {
+      $.getJSON('/data/short-and-one-letter.json', function(all) {
         callback(select, all);
       })
       .fail(function(err) {
@@ -263,11 +263,11 @@ $(function() {
     return x - Math.floor(x);
   }
 
-  /* 
+  /*
   Seed Random Tester
   test = {}
   for (i = 0; i < 100000; i ++) {
-    
+
     a = Math.floor(randomSeed(seed)*100);
     if (test[a]) {
       test[a] ++;
@@ -322,11 +322,11 @@ $(function() {
       console.log(wordSet, wordSet.length);
 
       // for testing
-      
+
       $('.enter-name-container').hide();
       gameState = 'IN_GAME';
       animateTilesEnter(wordSet[0][0], wordSet[0][1]);
-      
+
     })
   }
 

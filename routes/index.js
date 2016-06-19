@@ -27,6 +27,8 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
       }, function() {
         res.send({success: true});
       });
+    } else {
+      res.send({success: true});
     }
   });
 });

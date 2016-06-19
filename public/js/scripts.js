@@ -22,7 +22,7 @@ var gameState = 'ENTER_NAME';
 const TOTAL_WORDS_IN_SET = 20;
 const COUNTDOWN_TIME = 400;
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 3;
+const GAME_TIME_LENGTH = 15;
 
 $(function() {
 
@@ -94,6 +94,7 @@ $(function() {
   }
 
   function resetGame() {
+    secondsSinceLast = 0
     wordSetCounter = 0;
     wordSet = [];
     playerPlacematStack = [];

@@ -94,7 +94,6 @@ $(function() {
   }
 
   function resetGame() {
-    secondsSinceLast = 0
     wordSetCounter = 0;
     wordSet = [];
     playerPlacematStack = [];
@@ -125,6 +124,9 @@ $(function() {
     animateTilesEnter(wordSet[0][0], wordSet[0][1]);
     gameTimerCount = GAME_TIME_LENGTH
     $('.timer').text(gameTimerCount);
+
+    // reset hint timer
+    secondsSinceLastSolve = 0;
     gameTimer = setInterval(function() {
       gameTimerCountdown();
     }, 1000);

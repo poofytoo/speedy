@@ -15,7 +15,7 @@ router.get('/login', function(req, res, next) {
 router.post('/score', auth.loggedIn, function(req, res, next) {
   var scoreRef = firebaseRef.ref('scores/' + req.user.id);
 
-  scoreRef.on("value", function(snapshot) {
+  scoreRef.once("value", function(snapshot) {
     if (snapshot.val() != null && parseInt(req.body.score) > snapshot.val().score) {
       scoreRef.child("score").set(parseInt(req.body.score), function() {
         res.send({success: true});
@@ -36,8 +36,8 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
 router.get('/scores', function(req, res, next) {
   var scoreRef = firebaseRef.ref('scores');
   var sent = false;
-  scoreRef.on("value", function(scoreSnapshot) {
-    scoreRef.orderByChild("score").on("value", function(snapshot) {
+  scoreRef.once("value", function(scoreSnapshot) {
+    scoreRef.orderByChild("score").once("value", function(snapshot) {
       if (!sent) {
         sent = true;
         var scores = [];

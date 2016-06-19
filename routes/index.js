@@ -25,7 +25,7 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
 router.get('/scores', function(req, res, next) {
   var scoreRef = firebaseRef.ref('scores');
   scoreRef.orderByChild("score").on("value", function(snapshot) {
-    res.send({scores: snapshot.val()});
+    res.send({scores: snapshot.val().reverse()});
   });
 });
 

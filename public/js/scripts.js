@@ -14,6 +14,7 @@ var tileTracker = {};
 var solvedWords = [];
 var gameTimer;
 var gameTimerCount = 0;
+var lastSolveTime; // number of seconds left when the last word was solved
 
 var fullDictionary = {}
 
@@ -148,6 +149,7 @@ $(function() {
       backgroundColor: "#fff"
     }, 1000, "easeInOutQuad", function() {
       gameState = 'GAME_ENDED';
+      console.log(wordSetCounter, wordSet[wordSetCounter]);
       clearTileBoard();
       $('.timer-container').hide();
       showHighScore();
@@ -167,14 +169,20 @@ $(function() {
     console.log('solvedwords', solvedWords);
     var longestLength = 0;
     var score = 0;
+    var totalWordsToDisplay = solvedWords.length;
 
     for (i in solvedWords) {
       longestLength = Math.max(solvedWords[i][0].length, longestLength);
     }
 
+    if (lastSolveTime === undefined || lastSolveTime > 0) {
+      longestLength = Math.max(wordSet[wordSetCounter][0].length, longestLength);
+      totalWordsToDisplay += 1;
+    }
+
     for (i in solvedWords) {
       wordRound = solvedWords[i];
-      
+
       for (j in wordRound[0]) {
         letter = wordRound[0][j];
         $letter = $('<div id="mini-'+i+'-'+j+'" class="mini-letter-tile">'+letter+'</div>');
@@ -211,6 +219,41 @@ $(function() {
       }
     }
 
+    // if there is an unsolved word, show that too
+    if (lastSolveTime == undefined || lastSolveTime > 0) {
+      var unsolvedWordRound = wordSet[wordSetCounter];
+      var numSolved = solvedWords.length;
+
+      for (j in unsolvedWordRound[0]) {
+        letter = unsolvedWordRound[0][j];
+        $letter = $('<div id="mini-'+i+'-'+j+'" class="mini-letter-tile mini-letter-tile-unsolved">'+letter+'</div>');
+        $letter.css({
+          top: numSolved*30,
+          left: j*25
+        })
+        $('.game-container').append($letter);
+      }
+
+      singleLetterFound = false;
+
+      for (j in unsolvedWordRound[2]) {
+        letter = unsolvedWordRound[2][j];
+        $letter = $('<div class="mini-letter-tile mini-letter-tile-unsolved">'+letter+'</div>');
+        $letter.css({
+          top: numSolved*30,
+          left: j*25 + (longestLength+1)*25
+        })
+
+        // look for the single letter to highlight
+        if (letter == unsolvedWordRound[1] && !singleLetterFound) {
+          singleLetterFound = true;
+          $letter.addClass('highlight')
+        }
+
+        $('.game-container').append($letter);
+      }
+    }
+
     function blinkScoreTile(countUp) {
       $('#scoring-' + countUp).animate({
         opacity: 0
@@ -235,7 +278,7 @@ $(function() {
 
     $fsc = $('<div class="final-score-caption">final score: <span class="final-score-container">0</span></div>');
     $fsc.css({
-      top: solvedWords.length * 30+20,
+      top: totalWordsToDisplay * 30+20,
       left: 0
     })
     $fsc.find('.final-score-container').text('0')
@@ -244,7 +287,7 @@ $(function() {
 
     $playAgainBtn = $('<div class="play-again">play again</div>').hide();
     $playAgainBtn.css ({
-      top: solvedWords.length * 30+68,
+      top: totalWordsToDisplay * 30+68,
       left: -5
     })
     $('.game-container').append($playAgainBtn);
@@ -254,7 +297,7 @@ $(function() {
     $highscore.append('<h3>highscores</h3>');
     $highscoreTable = $('<table></table>')
 
-    $.post('/score', {score: score, seed: seed}, function() {  
+    $.post('/score', {score: score, seed: seed}, function() {
       $.get('/scores', function(data) {
         console.log(data.scores);
         for (i in data.scores) {
@@ -278,7 +321,8 @@ $(function() {
     gameTimerCount --;
     if (gameTimerCount < 0) {
       gameTimerCount = 0;
-      console.log('ENDING GAME NOW', gameState)
+      console.log('ENDING GAME NOW', gameState);
+
       endGame();
       clearInterval(gameTimer);
     } else {
@@ -371,12 +415,13 @@ $(function() {
         $('.game-container .player-placemat').fadeOut();
         $('.game-container .hint-container').fadeOut();
         $('.game-container .plus-tile-placemat').fadeOut();
-        setTimeout(function() {  
+        setTimeout(function() {
           clearTileBoard();
           resetAndLoadNew();
         }, 400)
       }, 400)
-      console.log('VALID!')
+      console.log('VALID!');
+      lastSolveTime = gameTimerCount;
       solvedWords.push([
         wordSet[wordSetCounter][0],
         wordSet[wordSetCounter][1],

@@ -6,6 +6,8 @@
   transform: translateY(-50%);
 }
 
+$tile-color: #EBE8E2;
+
 html, body {
   height: 100%;
 }
@@ -63,7 +65,7 @@ h2 {
 
     .letter-tile {
       position: absolute;
-      background-color: #EBE8E2; 
+      background-color: #EBE8E2;
       color: #423F3B;
       display: inline-block;
       width: 80px;
@@ -186,7 +188,7 @@ input {
 
 .mini-letter-tile {
   position: absolute;
-  background-color: #EBE8E2; 
+  background-color: $tile-color;
   color: #423F3B;
   display: inline-block;
   width: 20px;
@@ -205,6 +207,17 @@ input {
   &.highlight {
     background-color: #FFDB92;
     box-shadow: 0px 2px 0px #E9C378;
+  }
+
+  &.mini-letter-tile-unsolved {
+    background-color: lighten($tile-color, 5%);
+    color: lighten(#423F3B, 50%);
+
+    &.highlight {
+      background-color: #E25757;
+      box-shadow: 0 2px 0 #B71717;
+      color: white;
+    }
   }
 }
 
@@ -231,7 +244,7 @@ input {
 .highscore-container {
   position: absolute;
   display: none;
-  
+
   h3 {
     font-family: 'Open Sans', sans-serif;
     text-transform: uppercase;

@@ -167,6 +167,13 @@ input {
   .mini-letter-tile.highlight {
     background-color: #FFDB92;
     box-shadow: 0px 2px 0px #E9C378; }
+  .mini-letter-tile.mini-letter-tile-unsolved {
+    background-color: #f5f4f1;
+    color: #c2bfba; }
+    .mini-letter-tile.mini-letter-tile-unsolved.highlight {
+      background-color: #E25757;
+      box-shadow: 0 2px 0 #B71717;
+      color: white; }
 
 .final-score-caption {
   font-family: 'Open Sans', sans-serif;

@@ -10,6 +10,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 
 var config = require('./config');
 var routes = require('./routes/index');
+var gameRoutes = require('./routes/game');
 var auth = require('./auth');
 
 var app = express();
@@ -47,6 +48,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', routes);
+app.use('/game', gameRoutes);
 
 app.get('/auth/facebook',
   passport.authenticate('facebook'));

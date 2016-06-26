@@ -405,7 +405,6 @@ $(function() {
   function scatterOut($elem) {
     l = (Math.random()*50 + 50) * (Math.random() < 0.5 ? -1 : 1);
     t = (Math.random()*50 + 50) * (Math.random() < 0.5 ? -1 : 1);
-    console.log($elem.position().top)
     $elem.animate({
       top: $elem.position().top + t,
       left: $elem.position().left + l,
@@ -417,6 +416,7 @@ $(function() {
     userWord = playerPlacematStack.map(function(elem){
       return elem.t;
     }).join("");
+    console.log(userWord);
     if (fullDictionary[userWord] !== undefined) {
       $('.game-container .player-placemat').animate({
         backgroundColor: '#6FD06C',
@@ -435,6 +435,7 @@ $(function() {
         }, 400)
       }, 400)
       console.log('VALID!');
+      playerPlacematStack = [];
       lastSolveTime = gameTimerCount;
       solvedWords.push([
         wordSet[wordSetCounter][0],

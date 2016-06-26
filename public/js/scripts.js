@@ -21,9 +21,9 @@ var fullDictionary = {}
 var gameState = 'ENTER_NAME';
 
 const TOTAL_WORDS_IN_SET = 20;
-const COUNTDOWN_TIME = 800;
+const COUNTDOWN_TIME = 100; // 800
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 15;
+const GAME_TIME_LENGTH = 5;
 const FINAL_SCORE_COUNT_SPEED = 50;
 
 $(function() {
@@ -311,11 +311,12 @@ $(function() {
         console.log(data.scores);
         for (i in data.scores) {
           row = data.scores[i];
-          rowHTML = '<tr><td class="score">' + row.score + '</td><td>' + row.user.firstName + ' '  + row.user.lastInitial + '.</td></tr>';
+          rowHTML = '<tr><td class="score">' + row.score + '</td>';
+          rowHTML += '<td>' + row.user.firstName + ' '  + row.user.lastInitial + '.</td>'
+          rowHTML += '<td><div class="replay-game-id-btn">load this game</div></td></tr>'
           $highscoreTable.append(rowHTML)
         }
         $highscore.append($highscoreTable);
-        console.log('ADDING SIR ')
         $('.game-container').append($highscore);
         $highscore.css({
           top: 0,
@@ -330,8 +331,6 @@ $(function() {
     gameTimerCount --;
     if (gameTimerCount < 0) {
       gameTimerCount = 0;
-      console.log('ENDING GAME NOW', gameState);
-
       endGame();
       clearInterval(gameTimer);
     } else {
@@ -416,7 +415,6 @@ $(function() {
     userWord = playerPlacematStack.map(function(elem){
       return elem.t;
     }).join("");
-    console.log(userWord);
     if (fullDictionary[userWord] !== undefined) {
       $('.game-container .player-placemat').animate({
         backgroundColor: '#6FD06C',
@@ -434,7 +432,6 @@ $(function() {
           resetAndLoadNew();
         }, 400)
       }, 400)
-      console.log('VALID!');
       playerPlacematStack = [];
       lastSolveTime = gameTimerCount;
       solvedWords.push([

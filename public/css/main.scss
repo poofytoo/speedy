@@ -269,7 +269,8 @@ input {
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
     font-size: 14px;
-    padding-bottom: 5px;
+    padding-bottom: 3px;
+    padding-top: 5px;
     padding-right: 8px;
     color: #666;
     text-align: left;
@@ -292,5 +293,35 @@ input {
   &:hover {
     opacity: 0.8;
     cursor: pointer;
+  }
+}
+.replay-game-id-btn {
+  font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 5px 1px;
+  font-size: 9px;
+  border-radius: 30px;
+  background-color: #CFCAC3;
+  color: #fff;
+  position: absolute;
+  width: 99px;
+  text-align: center;
+  line-height: 12px;
+  vertical-align: top;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+
+}
+
+tr:hover {
+  cursor: pointer;
+
+  .replay-game-id-btn {
+    opacity: 1;
+    cursor: pointer;
+    transition: opacity 0.2s;
   }
 }

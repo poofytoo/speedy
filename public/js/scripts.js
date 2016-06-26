@@ -73,6 +73,7 @@ $(function() {
   function fetchGame(callback) {
     $.get(FETCH_GAME_URL, function(data) {
       wordSet = data.game;
+      console.log(wordSet);
       callback();
     });
   }
@@ -424,6 +425,7 @@ $(function() {
     userWord = playerPlacematStack.map(function(elem){
       return elem.t;
     }).join("");
+    console.log(fullDictionary[userWord]);
     if (fullDictionary[userWord] !== undefined) {
       $('.game-container .player-placemat').animate({
         backgroundColor: '#6FD06C',
@@ -481,11 +483,11 @@ $(function() {
       playerPlacematX = gameWidth / 2 - ((lettersArr.length+1) * (placematWidth+placematSpacing) - placematSpacing)/2 + i * (placematWidth+placematSpacing)
       playerPlacematY = 250
 
-      $playerPlacemat = $('<div id="pp'+i+'" class="player-placemat"></div>');
-      $playerPlacemat.css({
-        left: playerPlacematX,
-        top: playerPlacematY
-      })
+      $playerPlacemat = $('<div id="pp'+i+'" class="player-placemat"></div>')
+        .css({
+          left: playerPlacematX,
+          top: playerPlacematY
+        })
       $('.game-container').append($playerPlacemat);
     }
 
@@ -495,165 +497,42 @@ $(function() {
       letterStartY = 130
       $tile = generateLetterTile(letter, letterStartY, letterStartX, i);
 
-      $wordbankPlacemat = $('<div class="wordbank-placemat"></div>');
-      $wordbankPlacemat.css({
+      $wordbankPlacemat = $('<div class="wordbank-placemat"></div>')
+        .css({
         left: letterStartX,
         top: letterStartY
       })
       $tile.attr('id', 't' + i)
-      $('.game-container').append($wordbankPlacemat);
-      $('.game-container').append($tile);
+      $('.game-container').append($wordbankPlacemat)
+        .append($tile);
     }
 
     plusStartX = gameWidth / 2 - tileWidth / 2;
     plusStartY = 0;
-    $plusTile = generateLetterTile(plusLetter, plusStartY, plusStartX, lettersArr.length);
-    $plusTile.attr('id', 't' + lettersArr.length);
+    $plusTile = generateLetterTile(plusLetter, plusStartY, plusStartX, lettersArr.length)
+      .attr('id', 't' + lettersArr.length);
 
-    $plusTilePlacemat = $('<div class="plus-tile-placemat"></div>');
-    $plusTilePlacemat.css({
-      left: plusStartX - 5,
-      top: plusStartY + 4
-    }).fadeIn();
-    // $plusTile.addClass('plus-tile');
+    $plusTilePlacemat = $('<div class="plus-tile-placemat"></div>')
+      .css({
+        left: plusStartX - 5,
+        top: plusStartY + 4
+      }).fadeIn();
 
-    $('.game-container').append($plusTilePlacemat);
-    $('.game-container').append($plusTile);
-
-    $('.game-container').show();
-
-    /*
-    for (i = 0; i < lettersArr.length+1; i ++) {
-      $('.placemat-container').append($('<span id="l'+i+'" class="tile-placemat"></span>'))
-    }
-    $plusTile = generateLetterTile(plusLetter);
-    $plusTile.addClass('plus-tile');
-    $('.plus-tile-container').append($plusTile);
-    $('.game-container').show();
-    */
-  }
-
-  function getLetterDifference(s1, l2) {
-    // Get letter difference, short word, long word
-    for (var i = 0; i < s1.length; i ++) {
-      char = s1.charAt(i);
-      k = l2.indexOf(char)
-      if (k != -1) {
-        l2 = l2.substr(0,k) + l2.substr(k+1, l2.length);
-      } else {
-        return false;
-      }
-    }
-    return l2
+    $('.game-container').append($plusTilePlacemat)
+      .append($plusTile)
+      .show();
   }
 
   function generateDictionary(callback) {
     $.getJSON('/data/dictionary.json', function(data) {
-      fullDictionary = data;
+      callback(data)
     });
-
-    $.getJSON('/data/short-and-one-letter-select.json', function(select) {
-      $.getJSON('/data/short-and-one-letter.json', function(all) {
-        callback(select, all);
-      })
-      .fail(function(err) {
-        console.log( "error" , err);
-      });
-    })
-    .fail(function(err) {
-      console.log( "error" , err);
-    });
-  }
-
-  function generateSeed() {
-    return Math.floor(Math.random() * 89999 + 10000)
-  }
-
-  function randomSeed(seed) {
-    var x = Math.sin(seed++) * 10000;
-    return x - Math.floor(x);
-  }
-
-  /*
-  Seed Random Tester
-  test = {}
-  for (i = 0; i < 100000; i ++) {
-
-    a = Math.floor(randomSeed(seed)*100);
-    if (test[a]) {
-      test[a] ++;
-    } else {
-      test[a] = 1;
-    }
-  }
-  console.log(test);
-  */
-
-
-  function generateWordList(seed) {
-    random = randomSeed(seed);
-    numberOfWords = TOTAL_WORDS_IN_SET;
-
-    numEasyWordsCounter = 0;
-    startingIndex = Math.floor(wordList.length * random)
-    for (i = 0; i < numberOfWords; i ++) {
-
-      randomIndex = Math.floor(wordList.length*randomSeed(seed*(i+1)))
-      wordProbe = wordList[randomIndex];
-
-      if (wordSet.indexOf(wordProbe) < 0) {
-        wordPlusIndex = Math.floor(wordDictionarySelect[wordProbe].length*randomSeed(seed/(i+1)))
-        wordPlus = wordDictionarySelect[wordProbe][wordPlusIndex];
-        if (allWordList.indexOf(wordPlus) > -1) {
-
-          letter = getLetterDifference(wordList[randomIndex], wordPlus)
-          console.log(wordList[randomIndex], letter, wordPlus)
-          wordSet.push([wordList[randomIndex], letter, wordPlus]);
-        } else {
-          // ensuring there is at least one word in the easy set
-          // word not in 'easy' set
-          if (numberOfWords < MAX_SEARCH) {
-            numberOfWords += 1;
-          }
-        }
-      } else {
-        // word not in set
-        if (numberOfWords < MAX_SEARCH) {
-          numberOfWords += 1;
-        }
-      }
-    }
   }
 
   function init() {
-    generateDictionary(function(dSelect, dAll) {
-      // Selected 'good words'
-      // AllWordList: all valid words in the scrabble dictionary
-      wordDictionarySelect = dSelect;
-      wordDictionaryAll = dAll
-
-      wordList = Object.keys(dSelect);
-      allWordList = Object.keys(dAll);
-
-      seed = generateSeed();
-
-      console.log('seed: ', seed)
-      // seed = 5;
-      generateWordList(seed);
-
-      // console.log(wordSet, wordSet.length);
-
-      // for testing
-
-/*
-      $('.enter-name-container').hide();
-      startGame();
-      */
-      /*
-      gameState = 'IN_GAME';
-      animateTilesEnter(wordSet[0][0], wordSet[0][1]);
-      */
-
+    generateDictionary(function(dAll) {
+      console.log(dAll);
+      fullDictionary = dAll
     })
   }
 

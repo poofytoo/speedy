@@ -21,9 +21,9 @@ var fullDictionary = {}
 var gameState = 'ENTER_NAME';
 
 const TOTAL_WORDS_IN_SET = 20;
-const COUNTDOWN_TIME = 100; // 800
+const COUNTDOWN_TIME = 700; // 800
 const MAX_SEARCH = 1000;
-const GAME_TIME_LENGTH = 5;
+const GAME_TIME_LENGTH = 15;
 const FINAL_SCORE_COUNT_SPEED = 50;
 const FETCH_GAME_URL = '/game/new';
 
@@ -45,7 +45,6 @@ $(function() {
   });
 
   $(document).on('click', '.play-again', function(e) {
-    console.log('play again');
     if (gameState == 'GAME_ENDED') {
       resetGame();
     }
@@ -80,6 +79,7 @@ $(function() {
 
   function confirmStartGame() {
     if (gameState == 'ENTER_NAME') {
+      gameState = 'COUNTDOWN';
       $('.start-game-container').animate({
         top: "-100",
         opacity: 0
@@ -92,7 +92,6 @@ $(function() {
   }
 
   function showCountdown() {
-    gameState = 'COUNTDOWN';
     $('.countdown-container').fadeIn();
     animateCountdown();
   }
@@ -425,7 +424,6 @@ $(function() {
     userWord = playerPlacematStack.map(function(elem){
       return elem.t;
     }).join("");
-    console.log(fullDictionary[userWord]);
     if (fullDictionary[userWord] !== undefined) {
       $('.game-container .player-placemat').animate({
         backgroundColor: '#6FD06C',
@@ -531,7 +529,6 @@ $(function() {
 
   function init() {
     generateDictionary(function(dAll) {
-      console.log(dAll);
       fullDictionary = dAll
     })
   }

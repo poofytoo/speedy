@@ -32,9 +32,16 @@ h2 {
   @include vertical-align();
   text-align: center;
 
-  .enter-name-container {
+  .start-game-container {
     top: 0;
     position: relative;
+    height: 40px;
+    width: 500px;
+    margin: 0 auto;
+
+    .start-game {
+      position: relative;
+    }
   }
 
   .countdown-container {
@@ -269,7 +276,7 @@ input {
   }
 }
 
-.play-again {
+.play-again, .start-game {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
   font-weight: 700;
@@ -278,7 +285,7 @@ input {
   padding: 10px 26px;
   font-size: 15px;
   border-radius: 30px;
-  background-color: #E1DDD7;
+  background-color: #CFCAC3;
   color: #fff;
   position: absolute;
 

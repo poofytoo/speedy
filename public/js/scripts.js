@@ -21,9 +21,10 @@ var fullDictionary = {}
 var gameState = 'ENTER_NAME';
 
 const TOTAL_WORDS_IN_SET = 20;
-const COUNTDOWN_TIME = 400;
+const COUNTDOWN_TIME = 800;
 const MAX_SEARCH = 1000;
 const GAME_TIME_LENGTH = 15;
+const FINAL_SCORE_COUNT_SPEED = 50;
 
 $(function() {
 
@@ -49,17 +50,13 @@ $(function() {
     }
   })
 
+  $(document).on('click', '.start-game', function(e) {
+    confirmStartGame();
+  })
+
   $(document).bind('keydown', function(e) {
     if(e.which == 13) {
-      if (gameState == 'ENTER_NAME') {
-        $('.enter-name-container').animate({
-          top: "-100",
-          opacity: 0
-        }, 600, 'easeInBack', function() {
-          $('.enter-name-container').hide();
-          showCountdown();
-        });
-      }
+      confirmStartGame();
     }
     if (gameState == 'IN_GAME') {
       if (e.which != 8) {
@@ -71,6 +68,18 @@ $(function() {
       }
     }
   });
+
+  function confirmStartGame() {
+    if (gameState == 'ENTER_NAME') {
+      $('.start-game-container').animate({
+        top: "-100",
+        opacity: 0
+      }, 600, 'easeInBack', function() {
+        $('.start-game-container').hide();
+        showCountdown();
+      });
+    }
+  }
 
   function showCountdown() {
     gameState = 'COUNTDOWN';
@@ -267,7 +276,7 @@ $(function() {
         countUp ++;
         setTimeout(function() {
           blinkScoreTile(countUp)
-        }, 100)
+        }, FINAL_SCORE_COUNT_SPEED)
       }
     }
 
@@ -374,10 +383,15 @@ $(function() {
     for (i in tileTracker) {
       if (tileTracker[i].t == letter && tileTracker[i].l == 'BANK') {
         tileTracker[i].l = 'PLACEMAT'
-        $('#t' + i).animate({
-          left: placematPosition.left + 5,
-          top: placematPosition.top - 4
-        }, 100)
+        $('#t' + i)
+          .stop()
+          .css({
+            opacity: 1
+          })
+          .animate({
+            left: placematPosition.left + 5,
+            top: placematPosition.top - 4
+          }, 100)
         playerPlacematStack.push(tileTracker[i])
         break
       }

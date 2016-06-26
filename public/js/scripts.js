@@ -313,7 +313,7 @@ $(function() {
           row = data.scores[i];
           rowHTML = '<tr><td class="score">' + row.score + '</td>';
           rowHTML += '<td>' + row.user.firstName + ' '  + row.user.lastInitial + '.</td>'
-          rowHTML += '<td><div class="replay-game-id-btn">load this game</div></td></tr>'
+          rowHTML += '<td><div class="replay-game-id-btn">load game</div></td></tr>'
           $highscoreTable.append(rowHTML)
         }
         $highscore.append($highscoreTable);

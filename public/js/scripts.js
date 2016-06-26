@@ -25,6 +25,7 @@ const COUNTDOWN_TIME = 100; // 800
 const MAX_SEARCH = 1000;
 const GAME_TIME_LENGTH = 5;
 const FINAL_SCORE_COUNT_SPEED = 50;
+const FETCH_GAME_URL = '/game/new';
 
 $(function() {
 
@@ -69,6 +70,13 @@ $(function() {
     }
   });
 
+  function fetchGame(callback) {
+    $.get(FETCH_GAME_URL, function(data) {
+      wordSet = data.game;
+      callback();
+    });
+  }
+
   function confirmStartGame() {
     if (gameState == 'ENTER_NAME') {
       $('.start-game-container').animate({
@@ -76,7 +84,8 @@ $(function() {
         opacity: 0
       }, 600, 'easeInBack', function() {
         $('.start-game-container').hide();
-        showCountdown();
+        fetchGame(showCountdown);
+        // showCountdown();
       });
     }
   }
@@ -116,15 +125,15 @@ $(function() {
     $('.countdown-2').removeClass('countdown-transition')
     $('.countdown-3').removeClass('countdown-transition')
 
-    seed = generateSeed();
-    generateWordList(seed);
+    // seed = generateSeed();
+    // generateWordList(seed);
 
     if (gameState == 'GAME_ENDED') {
       $('.game-container *').fadeOut();
       setTimeout(function() {
         $('.game-container *').remove();
         $('.game-container').hide();
-        showCountdown();
+        fetchGame(showCountdown);
       }, 400)
     }
   }

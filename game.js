@@ -10,15 +10,7 @@ var wordList = Object.keys(comboWords);
 const TOTAL_WORDS_IN_SET = 20;
 
 
-function newGame(user) {
-  // scary code to remove things
-  goodbyeScores = firebaseRef.ref('scores');
-  goodbyeScores.once('value', function(data) {
-    console.log(data.val())
-  });
-  /*
-  goodbyeScores.set('');
-  */
+function newGame(user, callback) {
 
   var random = Math.random();
   // it's fun time, let's make a new game!

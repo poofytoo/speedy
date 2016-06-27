@@ -274,6 +274,6 @@ tr:hover {
     transition: opacity 0.2s; }
 
 tr.hasPlayed:hover {
-  cursor: pointer; }
+  cursor: default; }
 
 /*# sourceMappingURL=main.css.map */

@@ -15,7 +15,6 @@ function getScores(userID, callback) {
         var scores = [];
         snapshot.forEach(function(data) {
           scores.push(data.val())
-          console.log(data.val())
         });
         callback({scores: scores.reverse(), user: user})
       });
@@ -39,11 +38,7 @@ router.get('/highscores', auth.loggedIn, function(req, res, next) {
 })
 
 router.get('/', function(req, res, next) {
-  if (req.isAuthenticated()) {
-    res.redirect('/play');
-  } else {
-    res.render('login', {layout: 'login_layout'});
-  }
+  res.render('login', {layout: 'login_layout'});
 });
 
 router.get('/logout', function(req, res) {

@@ -30,12 +30,6 @@ $(function() {
   var placematSpacing = 10;
   var secondsSinceLastSolve = 0;
 
-  $(".test-score").click(function() {
-    $.post("/score", { score: 30 }, function(response) {
-      console.log(response);
-    });
-  });
-
   $(document).on('click', '.play-again', function(e) {
     if (gameState == 'GAME_ENDED') {
       resetGame();
@@ -72,7 +66,6 @@ $(function() {
     $.get('/game/id/' + id, function(data) {
       wordSet = data.game;
       currentGameID = data.id;
-      console.log(currentGameID, wordSet);
       callback();
     });
   }
@@ -81,7 +74,6 @@ $(function() {
     $.get(FETCH_GAME_URL, function(data) {
       wordSet = data.game;
       currentGameID = data.id;
-      console.log(currentGameID, wordSet);
       callback();
     });
   }
@@ -149,7 +141,7 @@ $(function() {
           $('.game-container').hide();
           fetchGameByID(id, showCountdown);
         }, 400)
-      } 
+      }
     }
   }
 
@@ -182,7 +174,6 @@ $(function() {
       backgroundColor: "#fff"
     }, 1000, "easeInOutQuad", function() {
       gameState = 'GAME_ENDED';
-      console.log(wordSetCounter, wordSet[wordSetCounter]);
       clearTileBoard();
       $('.timer-container').hide();
       showHighScore();
@@ -199,7 +190,6 @@ $(function() {
   }
 
   function showHighScore() {
-    console.log('solvedwords', solvedWords);
     var longestLength = 0;
     var score = 0;
     var totalWordsToDisplay = solvedWords.length;

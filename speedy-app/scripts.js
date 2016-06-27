@@ -17,7 +17,7 @@ $(function() {
   const TOTAL_WORDS_IN_SET = 20;
   const COUNTDOWN_TIME = 700; // 800
   const MAX_SEARCH = 1000;
-  const GAME_TIME_LENGTH = 15;
+  const GAME_TIME_LENGTH = 60;
   const FINAL_SCORE_COUNT_SPEED = 50;
   const FETCH_GAME_URL = '/game/new';
 

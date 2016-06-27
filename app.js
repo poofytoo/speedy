@@ -58,6 +58,7 @@ app.get('/auth/facebook/callback',
   function(req, res) {
     // Successful authentication, redirect home.
     var returnPath = req.session.returnPath ? req.session.returnPath : '/play';
+    req.session.returnPath = null;
     res.redirect(returnPath);
   });
 

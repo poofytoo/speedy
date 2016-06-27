@@ -39,7 +39,11 @@ router.get('/highscores', auth.loggedIn, function(req, res, next) {
 })
 
 router.get('/', function(req, res, next) {
-  res.render('login', {layout: 'login_layout'});
+  if (req.isAuthenticated()) {
+    res.redirect('/play');
+  } else {
+    res.render('login', {layout: 'login_layout'});
+  }
 });
 
 router.get('/logout', function(req, res) {

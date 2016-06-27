@@ -248,10 +248,8 @@ input {
   color: #666;
 }
 
-.highscore-container {
-  position: absolute;
-  display: none;
-
+.highscore-container,
+.main-highscore-container {
   h3 {
     font-family: 'Open Sans', sans-serif;
     text-transform: uppercase;
@@ -275,6 +273,11 @@ input {
     color: #666;
     text-align: left;
   }
+}
+
+.highscore-container {
+  display: none;
+  position: absolute;
 }
 
 .play-again, .start-game {

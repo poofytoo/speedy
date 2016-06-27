@@ -3,10 +3,33 @@ var router = express.Router();
 var auth = require('../auth');
 var firebaseRef = require('../firebase');
 
+function getScores(callback) {
+  var scoreRef = firebaseRef.ref('scores');
+  scoreRef.once("value", function(scoreSnapshot) {
+    scoreRef.orderByChild("score").once("value", function(snapshot) {
+      var scores = [];
+      snapshot.forEach(function(data) {
+        scores.push(data.val());
+      });
+      callback(scores.reverse());
+    });
+  });
+}
+
 /* GET home page. */
 router.get('/', auth.loggedIn, function(req, res, next) {
   res.render('index', { user: req.user });
 });
+
+router.get('/highscores', auth.loggedIn, function(req, res, next) {
+  var sent = false;
+  getScores(function(scores) {
+    if (!sent) {
+      sent = true;
+      res.render('highscores', { user: req.user, scores: scores});
+    }
+  })
+})
 
 router.get('/login', function(req, res, next) {
   res.render('login', {layout: 'login_layout'});
@@ -45,20 +68,12 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
 });
 
 router.get('/scores', function(req, res, next) {
-  var scoreRef = firebaseRef.ref('scores');
   var sent = false;
-  scoreRef.once("value", function(scoreSnapshot) {
-    scoreRef.orderByChild("score").once("value", function(snapshot) {
-      if (!sent) {
-        sent = true;
-        var scores = [];
-        snapshot.forEach(function(data) {
-          scores.push(data.val())
-          console.log(data.val())
-        });
-        res.send({scores: scores.reverse()});
-      }
-    });
+  getScores(function(scores) {
+    if (!sent) {
+      sent = true;
+      res.send({scores: scores});
+    }
   });
 });
 

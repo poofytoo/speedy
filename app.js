@@ -57,7 +57,8 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    var returnPath = req.session.returnPath ? req.session.returnPath : '/';
+    res.redirect(returnPath);
   });
 
 // catch 404 and forward to error handler

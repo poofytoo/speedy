@@ -243,6 +243,12 @@ input {
 .play-again {
   margin-bottom: 80px; }
 
+.greeting {
+  font-family: 'Open Sans', sans-serif;
+  margin-bottom: 10px;
+  color: #CCC8C1;
+  font-size: 14px; }
+
 .replay-game-id-btn, .your-score-badge {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;

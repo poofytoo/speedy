@@ -42,6 +42,20 @@ function saveRandomGame(game) {
   return newGameRef.key
 }
 
+// Given a word and a round number, return true only if the word is is an 
+// appropriate length/difficulty based on the round
+function checkWordDifficulty(word, level) {
+  wordLengthByRound = [3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 8, 9, 9, 10, 10, 10]
+  wordLengthVariance= [0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3]
+  if (level >= wordLengthByRound.length) {
+    return true;
+  } else if (word.length <= (wordLengthByRound[level] + wordLengthVariance[level]) && word.length >= (wordLengthByRound[level] - wordLengthVariance[level])){
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function generateNewGame() {
   var gameSet = [];
   var wordSet = [];
@@ -49,14 +63,16 @@ function generateNewGame() {
     var randomIndex = Math.floor(Math.random() * filteredWordList.length);
     var randomWord = filteredWordList[randomIndex];
 
-    if (wordSet.indexOf(randomWord) < 0) {
-      var randomLetterIndex = Math.floor(Math.random() * filteredComboWords[randomWord].length);
-      var randomWordCombo = filteredComboWords[randomWord][randomLetterIndex];
+    if (checkWordDifficulty(randomWord, gameSet.length)) {
+      if (wordSet.indexOf(randomWord) < 0) {
+        var randomLetterIndex = Math.floor(Math.random() * filteredComboWords[randomWord].length);
+        var randomWordCombo = filteredComboWords[randomWord][randomLetterIndex];
 
-      if (wordList.indexOf(randomWordCombo) >= 0) {
-        var extraLetter = getLetterDifference(randomWord, randomWordCombo);
-        gameSet.push([randomWord, extraLetter, randomWordCombo]);
-        wordSet.push(randomWord);
+        if (wordList.indexOf(randomWordCombo) >= 0) {
+          var extraLetter = getLetterDifference(randomWord, randomWordCombo);
+          gameSet.push([randomWord, extraLetter, randomWordCombo]);
+          wordSet.push(randomWord);
+        }
       }
     }
   }

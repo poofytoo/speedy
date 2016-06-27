@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "browserify speedy-app/highscore.js -v | uglifyjs -ms -o public/js/highscore.js & browserify speedy-app/scripts.js -v | uglifyjs -ms -o public/js/scripts.js & browserify speedy-app/login.js -v | uglifyjs -ms -o public/js/login.js",
+    "production": "npm run build & forever --uid='speedy' --killSignal=SIGTERM  -c nodemon ./bin/www --exitcrash",
     "start": "npm run watch & nodemon ./bin/www",
-    "watch": "watchify speedy-app/highscore.js -o public/js/highscore.js -v"
+    "watch": "watchify speedy-app/highscore.js -o public/js/highscore.js -v & watchify speedy-app/scripts.js -o public/js/scripts.js -v & watchify speedy-app/login.js -o public/js/login.js -v"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "browserify": "^13.0.1",
     "reactify": "^1.1.1",
+    "uglify": "^0.1.5",
     "watchify": "^3.7.0"
   }
 }

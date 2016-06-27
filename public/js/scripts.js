@@ -42,6 +42,13 @@ $(function() {
     }
   })
 
+  $(document).on('click', 'tr', function(e) {
+    id = $(this).data('gameid')
+    if (gameState == 'GAME_ENDED') {
+      resetGame(id);
+    }
+  })
+
   $(document).on('click', '.start-game', function(e) {
     confirmStartGame();
   })
@@ -60,6 +67,15 @@ $(function() {
       }
     }
   });
+
+  function fetchGameByID(id, callback) {
+    $.get('/game/id/' + id, function(data) {
+      wordSet = data.game;
+      currentGameID = data.id;
+      console.log(currentGameID, wordSet);
+      callback();
+    });
+  }
 
   function fetchGame(callback) {
     $.get(FETCH_GAME_URL, function(data) {
@@ -105,7 +121,8 @@ $(function() {
     }, COUNTDOWN_TIME*3)
   }
 
-  function resetGame() {
+  function resetGame(id) {
+    id = id || '';
     wordSetCounter = 0;
     wordSet = [];
     playerPlacematStack = [];
@@ -120,11 +137,19 @@ $(function() {
 
     if (gameState == 'GAME_ENDED') {
       $('.game-container *').fadeOut();
-      setTimeout(function() {
-        $('.game-container *').remove();
-        $('.game-container').hide();
-        fetchGame(showCountdown);
-      }, 400)
+      if (id == '') {
+        setTimeout(function() {
+          $('.game-container *').remove();
+          $('.game-container').hide();
+          fetchGame(showCountdown);
+        }, 400)
+      } else {
+        setTimeout(function() {
+          $('.game-container *').remove();
+          $('.game-container').hide();
+          fetchGameByID(id, showCountdown);
+        }, 400)
+      } 
     }
   }
 

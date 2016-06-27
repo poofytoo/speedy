@@ -380,7 +380,7 @@ $(function() {
   function checkSecondsSinceLastSolve() {
     solution = wordSet[wordSetCounter][2]
     for (i = 0; i < solution.length; i ++) {
-      if (secondsSinceLastSolve == i*3 + 6) {// Object.keys(tileTracker).length) {
+      if (secondsSinceLastSolve == i*2 + 6) {// Object.keys(tileTracker).length) {
         hintLetter = solution.substr(i,1);
         rLeft = $('#pp' + i).position().left;
         rTop = $('#pp' + i).position().top + tileHeight + 10;

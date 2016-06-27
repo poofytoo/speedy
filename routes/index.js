@@ -9,15 +9,15 @@ function getScores(userID, callback) {
     scoreRef.orderByChild("score").once("value", function(snapshot) {
 
       // fetch an updated list of games the user has played and his/her scores
-      var userScoreRef = firebaseRef.ref('users/' + userID + '/games')
-      userScoreRef.once("value", function(data) {
-        userGameScores = data.val()
+      var userRef = firebaseRef.ref('users/' + userID)
+      userRef.once("value", function(data) {
+        user = data.val()
         var scores = [];
         snapshot.forEach(function(data) {
           scores.push(data.val())
           console.log(data.val())
         });
-        callback({scores: scores.reverse(), user: userGameScores})
+        callback({scores: scores.reverse(), user: user})
       });
     });
   });

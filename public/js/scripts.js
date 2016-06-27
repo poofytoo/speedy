@@ -334,12 +334,17 @@ $(function() {
 
     $.post('/score', {score: score, game_id: currentGameID}, function() {
       $.get('/scores', function(data) {
-        userGameScores = data.user;
+        userGameScores = data.user.games;
         for (i in data.scores) {
           row = data.scores[i];
           playerName = row.user.firstName + ' '  + row.user.lastInitial + '.';
           gameid = row.game_id;
-          if (userGameScores[gameid] == undefined) {
+          if (row.user.id == data.user.id) {
+            // user is on highscore table
+            rowHTML = '<tr class="hasPlayed" data-gameid="'+gameid+'" data-playername="'+playerName+'"><td class="score">' + row.score + '</td>';
+            rowHTML += '<td>'+playerName+'</td>'
+            rowHTML += '<td></td></tr>'
+          } else if (userGameScores[gameid] == undefined) {
             // user has not played this game before
             rowHTML = '<tr data-gameid="'+gameid+'" data-playername="'+playerName+'"><td class="score">' + row.score + '</td>';
             rowHTML += '<td>'+playerName+'</td>'

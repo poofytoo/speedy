@@ -249,7 +249,7 @@ input {
   padding: 2px 5px 1px;
   font-size: 9px;
   border-radius: 30px;
-  background-color: #CFCAC3;
+  background-color: #7B766F;
   color: #fff;
   position: absolute;
   width: 80px;
@@ -260,9 +260,10 @@ input {
   transition: opacity 0.2s; }
 
 .your-score-badge {
+  padding: 1px 5px 0px;
   background-color: #fff;
-  border: 2px solid #CFCAC3;
-  color: #969088;
+  border: 1px solid #7B766F;
+  color: #3F3C38;
   width: 100px; }
 
 tr:hover {
@@ -271,5 +272,8 @@ tr:hover {
     opacity: 1;
     cursor: pointer;
     transition: opacity 0.2s; }
+
+tr.hasPlayed:hover {
+  cursor: pointer; }
 
 /*# sourceMappingURL=main.css.map */

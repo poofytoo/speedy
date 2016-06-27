@@ -1,12 +1,3 @@
-var data = {};
-var seed;
-
-var numberOfWords = 20;
-var numEasyWords = 10;
-
-var wordDictionaryAll;
-var wordDictionarySelect;
-
 var wordSetCounter = 0;
 var wordSet = [];
 var playerPlacematStack = [];
@@ -15,6 +6,7 @@ var solvedWords = [];
 var gameTimer;
 var gameTimerCount = 0;
 var lastSolveTime; // number of seconds left when the last word was solved
+var currentGameID;
 
 var fullDictionary = {}
 
@@ -72,7 +64,8 @@ $(function() {
   function fetchGame(callback) {
     $.get(FETCH_GAME_URL, function(data) {
       wordSet = data.game;
-      console.log(wordSet);
+      currentGameID = data.id;
+      console.log(currentGameID, wordSet);
       callback();
     });
   }
@@ -124,9 +117,6 @@ $(function() {
     $('.countdown-1').removeClass('countdown-transition')
     $('.countdown-2').removeClass('countdown-transition')
     $('.countdown-3').removeClass('countdown-transition')
-
-    // seed = generateSeed();
-    // generateWordList(seed);
 
     if (gameState == 'GAME_ENDED') {
       $('.game-container *').fadeOut();
@@ -315,13 +305,17 @@ $(function() {
     $highscore.append('<h3>highscores</h3>');
     $highscoreTable = $('<table></table>')
 
-    $.post('/score', {score: score, seed: seed}, function() {
+    gameID = '';
+
+    $.post('/score', {score: score, game_id: currentGameID}, function() {
       $.get('/scores', function(data) {
         console.log(data.scores);
         for (i in data.scores) {
           row = data.scores[i];
-          rowHTML = '<tr><td class="score">' + row.score + '</td>';
-          rowHTML += '<td>' + row.user.firstName + ' '  + row.user.lastInitial + '.</td>'
+          playerName = row.user.firstName + ' '  + row.user.lastInitial + '.';
+          gameid = row.game_id;
+          rowHTML = '<tr data-gameid="'+gameid+'" data-playername="'+playerName+'"><td class="score">' + row.score + '</td>';
+          rowHTML += '<td>'+playerName+'</td>'
           rowHTML += '<td><div class="replay-game-id-btn">load game</div></td></tr>'
           $highscoreTable.append(rowHTML)
         }

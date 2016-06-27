@@ -24,13 +24,17 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
 
   scoreRef.once("value", function(snapshot) {
     if (snapshot.val() != null && parseInt(req.body.score) > snapshot.val().score) {
-      scoreRef.child("score").set(parseInt(req.body.score), function() {
+      scoreRef.update({
+        score: parseInt(req.body.score),
+        game_id: req.body.game_id
+      }, function() {
         res.send({success: true});
       })
     } else if (snapshot.val() == null) {
       scoreRef.set({
         score: parseInt(req.body.score),
-        user: req.user
+        user: req.user,
+        game_id: req.body.game_id
       }, function() {
         res.send({success: true});
       });
@@ -50,6 +54,7 @@ router.get('/scores', function(req, res, next) {
         var scores = [];
         snapshot.forEach(function(data) {
           scores.push(data.val())
+          console.log(data.val())
         });
         res.send({scores: scores.reverse()});
       }

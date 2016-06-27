@@ -11,14 +11,42 @@ const TOTAL_WORDS_IN_SET = 20;
 
 
 function newGame(user) {
-  var random = Math.random();
+  // scary code to remove things
+  goodbyeScores = firebaseRef.ref('scores');
+  goodbyeScores.once('value', function(data) {
+    console.log(data.val())
+  });
+  /*
+  goodbyeScores.set('');
+  */
 
+  var random = Math.random();
   // it's fun time, let's make a new game!
   // if (random < 0.5) {
-    return generateNewGame();
+    randomGame = generateNewGame()
+    id = saveRandomGame(randomGame);
+    // store game
+
+    game = {
+      game: randomGame,
+      id: id
+    }
+    return game;
   // } else {
     // return getExistingGame(user);
   // }
+}
+
+function saveRandomGame(game) {
+  var gameRef = firebaseRef.ref('games');
+  newGameRef = gameRef.push(game);
+  /*
+  var gameID = newGameRef.key();
+
+  console.log(gameID)
+  gameRef.child(gameID).set(game);
+  */
+  return newGameRef.key
 }
 
 function generateNewGame() {
@@ -61,8 +89,18 @@ function getExistingGame(user) {
 
 }
 
+function savedGame(id, callback) {
+  // TODO: return saved game in firebase 
+  gameRef = firebaseRef.ref('games/' + id);
+  gameRef.once('value', function(data) {
+    game = {game: data.val(), id: id}
+    callback(game);
+  })
+}
+
 module.exports = {
-  newGame: newGame
+  newGame: newGame,
+  savedGame: savedGame
 };
 
 // module.exports = {

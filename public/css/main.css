@@ -276,4 +276,8 @@ tr:hover {
 tr.hasPlayed:hover {
   cursor: default; }
 
+.mobile-warning {
+  margin-top: 10px;
+  font-weight: 600; }
+
 /*# sourceMappingURL=main.css.map */

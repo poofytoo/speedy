@@ -240,7 +240,7 @@ input {
     opacity: 0.8;
     cursor: pointer; }
 
-.replay-game-id-btn {
+.replay-game-id-btn, .your-score-badge {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
   font-weight: 700;
@@ -258,6 +258,12 @@ input {
   vertical-align: top;
   opacity: 0.4;
   transition: opacity 0.2s; }
+
+.your-score-badge {
+  background-color: #fff;
+  border: 2px solid #CFCAC3;
+  color: #969088;
+  width: 100px; }
 
 tr:hover {
   cursor: pointer; }

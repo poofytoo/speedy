@@ -31,6 +31,7 @@ function newGame(user) {
       game: randomGame,
       id: id
     }
+    addGameIDToUser(user, id)
     return game;
   // } else {
     // return getExistingGame(user);
@@ -85,16 +86,21 @@ function getLetterDifference(s1, l2) {
   return l2
 }
 
-function getExistingGame(user) {
-
-}
-
-function savedGame(id, callback) {
-  // TODO: return saved game in firebase 
+function savedGame(user, id, callback) {
   gameRef = firebaseRef.ref('games/' + id);
   gameRef.once('value', function(data) {
     game = {game: data.val(), id: id}
+    addGameIDToUser(user, id)
     callback(game);
+  })
+}
+
+function addGameIDToUser(user, gameid) {
+  userRef = firebaseRef.ref('users/' + user.id + '/games/' + gameid)
+  userRef.once('value', function(data) {
+    if (data.val() == undefined) {
+      userRef.set('');
+    }
   })
 }
 

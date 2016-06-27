@@ -9,7 +9,7 @@ router.get('/new', auth.loggedIn, function(req, res, next) {
 });
 
 router.get('/id/:id', auth.loggedIn, function(req, res, next) {
-  game.savedGame(req.params.id, function(game) {
+  game.savedGame(req.user, req.params.id, function(game) {
     res.json(game);
   })
 });

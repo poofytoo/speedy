@@ -3,15 +3,22 @@ var router = express.Router();
 var auth = require('../auth');
 var firebaseRef = require('../firebase');
 
-function getScores(callback) {
+function getScores(userID, callback) {
   var scoreRef = firebaseRef.ref('scores');
   scoreRef.once("value", function(scoreSnapshot) {
     scoreRef.orderByChild("score").once("value", function(snapshot) {
-      var scores = [];
-      snapshot.forEach(function(data) {
-        scores.push(data.val());
+
+      // fetch an updated list of games the user has played and his/her scores
+      var userScoreRef = firebaseRef.ref('users/' + userID + '/games')
+      userScoreRef.once("value", function(data) {
+        userGameScores = data.val()
+        var scores = [];
+        snapshot.forEach(function(data) {
+          scores.push(data.val())
+          console.log(data.val())
+        });
+        callback({scores: scores.reverse(), user: userGameScores})
       });
-      callback(scores.reverse());
     });
   });
 }
@@ -23,7 +30,7 @@ router.get('/', auth.loggedIn, function(req, res, next) {
 
 router.get('/highscores', auth.loggedIn, function(req, res, next) {
   var sent = false;
-  getScores(function(scores) {
+  getScores(req.user.id, function(scores) {
     if (!sent) {
       sent = true;
       res.render('highscores', { user: req.user, scores: scores});
@@ -65,14 +72,17 @@ router.post('/score', auth.loggedIn, function(req, res, next) {
       res.send({success: true});
     }
   });
+
+  var userScoreRef = firebaseRef.ref('users/'+req.user.id+'/games/'+req.body.game_id)
+  userScoreRef.set(req.body.score);
 });
 
 router.get('/scores', function(req, res, next) {
   var sent = false;
-  getScores(function(scores) {
+  getScores(req.user.id, function(scoreboard) {
     if (!sent) {
       sent = true;
-      res.send({scores: scores});
+      res.send(scoreboard);
     }
   });
 });

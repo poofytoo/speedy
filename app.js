@@ -54,10 +54,10 @@ app.get('/auth/facebook',
   passport.authenticate('facebook'));
 
 app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  passport.authenticate('facebook', { failureRedirect: '/' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    var returnPath = req.session.returnPath ? req.session.returnPath : '/';
+    var returnPath = req.session.returnPath ? req.session.returnPath : '/play';
     res.redirect(returnPath);
   });
 

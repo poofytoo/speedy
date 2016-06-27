@@ -24,7 +24,7 @@ function getScores(userID, callback) {
 }
 
 /* GET home page. */
-router.get('/', auth.loggedIn, function(req, res, next) {
+router.get('/play', auth.loggedIn, function(req, res, next) {
   res.render('index', { user: req.user });
 });
 
@@ -38,7 +38,7 @@ router.get('/highscores', auth.loggedIn, function(req, res, next) {
   })
 })
 
-router.get('/login', function(req, res, next) {
+router.get('/', function(req, res, next) {
   res.render('login', {layout: 'login_layout'});
 });
 

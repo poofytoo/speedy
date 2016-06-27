@@ -42,7 +42,7 @@ module.exports = {
         next();
     } else {
         req.session.returnPath = req.route.path;
-        res.redirect('/login');
+        res.redirect('/');
     }
   },
 }

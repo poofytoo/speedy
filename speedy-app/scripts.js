@@ -20,8 +20,12 @@ $(function() {
   const MAX_SEARCH = 1000;
   const GAME_TIME_LENGTH = 60;
   const FINAL_SCORE_COUNT_SPEED = 50;
+
   const START_NEW_GAME_URL = '/game/new';
   const CONTINUE_GAME_URL = '/game/continue';
+  const GAME_POST_SCORE_URL = '/game/score';
+  const GAME_GET_SCORE_URL = '/game/scores';
+
 
   var gameWidth = $('.game-container').width();
   var gameHeight = $('.game-container').height();
@@ -331,8 +335,8 @@ $(function() {
 
     gameID = '';
 
-    $.post('/score', {score: score, game_id: currentGameID}, function() {
-      $.get('/scores', function(data) {
+    $.post(GAME_POST_SCORE_URL, {score: score, game_id: currentGameID}, function() {
+      $.get(GAME_GET_SCORE_URL, function(data) {
         userGameScores = data.user.games;
         for (i in data.scores) {
           row = data.scores[i];

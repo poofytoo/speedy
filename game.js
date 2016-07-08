@@ -170,10 +170,62 @@ function addGameIDToUser(user, gameid) {
   })
 }
 
+
+// req.user, req.body.game_id, req.body.score
+
+function postScore(user, gameid, score, callback) {
+  var scoreRef = firebaseRef.ref('scores/' + user.id);
+
+  scoreRef.once("value", function(snapshot) {
+    if (snapshot.val() != null && parseInt(score) > snapshot.val().score) {
+      scoreRef.update({
+        score: parseInt(score),
+        game_id: gameid
+      }, function() {
+        callback({success: true});
+      })
+    } else if (snapshot.val() == null) {
+      scoreRef.set({
+        score: parseInt(score),
+        user: req.user.id,
+        game_id: gameid
+      }, function() {
+        callback({success: true});
+      });
+    } else {
+      callback({success: true});
+    }
+  });
+
+  var userScoreRef = firebaseRef.ref('users/'+user.id+'/games/'+gameid)
+  userScoreRef.set(score);
+}
+
+function getScores(userID, callback) {
+  var scoreRef = firebaseRef.ref('scores');
+  scoreRef.once("value", function(scoreSnapshot) {
+    scoreRef.orderByChild("score").once("value", function(snapshot) {
+
+      // fetch an updated list of games the user has played and his/her scores
+      var userRef = firebaseRef.ref('users/' + userID)
+      userRef.once("value", function(data) {
+        user = data.val()
+        var scores = [];
+        snapshot.forEach(function(data) {
+          scores.push(data.val())
+        });
+        callback({scores: scores.reverse(), user: user})
+      });
+    });
+  });
+}
+
 module.exports = {
   newGame: newGame,
   savedGame: savedGame,
-  progressGame: progressGame
+  progressGame: progressGame,
+  postScore: postScore,
+  getScores: getScores
 };
 
 // module.exports = {

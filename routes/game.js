@@ -18,4 +18,19 @@ router.get('/id/:id', auth.loggedIn, function(req, res, next) {
   })
 });
 
+
+router.post('/score', auth.loggedIn, function(req, res, next) {
+  game.postScore(req.user, req.body.game_id, req.body.score, function(success) {
+    res.send(success);
+  });
+});
+
+router.get('/scores', function(req, res, next) {
+  game.getScores(req.user.id, function(scoreboard) {
+    res.send(scoreboard);
+  });
+});
+
+
+
 module.exports = router;

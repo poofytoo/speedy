@@ -8,6 +8,10 @@ router.get('/new', auth.loggedIn, function(req, res, next) {
   res.json(game.newGame(req.user));
 });
 
+router.get('/continue', auth.loggedIn, function(req, res, next) {
+  res.json(game.progressGame(req.user, req.query.gameToken, req.query.word));
+});
+
 router.get('/id/:id', auth.loggedIn, function(req, res, next) {
   game.savedGame(req.user, req.params.id, function(game) {
     res.json(game);

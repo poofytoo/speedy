@@ -9,6 +9,7 @@ $(function() {
   var gameTimerCount = 0;
   var lastSolveTime; // number of seconds left when the last word was solved
   var currentGameID;
+  var gameToken;
 
   var fullDictionary = {}
 
@@ -19,7 +20,8 @@ $(function() {
   const MAX_SEARCH = 1000;
   const GAME_TIME_LENGTH = 60;
   const FINAL_SCORE_COUNT_SPEED = 50;
-  const FETCH_GAME_URL = '/game/new';
+  const START_NEW_GAME_URL = '/game/new';
+  const CONTINUE_GAME_URL = '/game/continue';
 
   var gameWidth = $('.game-container').width();
   var gameHeight = $('.game-container').height();
@@ -77,8 +79,9 @@ $(function() {
   }
 
   function fetchGame(callback) {
-    $.get(FETCH_GAME_URL, function(data) {
+    $.get(START_NEW_GAME_URL, function(data) {
       wordSet = data.game;
+      gameToken = data.gameToken;
       currentGameID = data.id;
       callback();
     });
@@ -448,6 +451,19 @@ $(function() {
     }, 300, 'easeInQuad');
   }
 
+  // fetch more words from the server
+  function updateWordList(userWord) {
+    data = {
+      gameToken: gameToken,
+      word: userWord
+    }
+    console.log(data);
+    $.get(CONTINUE_GAME_URL, data, function(data) {
+      wordSet = data.game;
+      console.log('UPDATE!', wordSet);
+    })
+  }
+
   function checkProceed() {
     userWord = playerPlacematStack.map(function(elem){
       return elem.t;
@@ -456,6 +472,7 @@ $(function() {
       $('.game-container .player-placemat').animate({
         backgroundColor: '#6FD06C',
       }, 100);
+      updateWordList(userWord);
       setTimeout(function() {
         $.each($('.game-container .letter-tile'), function() {
           scatterOut($(this));
@@ -485,6 +502,7 @@ $(function() {
     tileTracker = {};
     playerPlacematStack = [];
     if (gameState == 'IN_GAME') {
+
       animateTilesEnter(wordSet[wordSetCounter][0], wordSet[wordSetCounter][1]);
     }
   }

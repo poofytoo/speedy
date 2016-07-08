@@ -7,27 +7,85 @@ var filteredComboWords = require('./data/short-and-one-letter-select.json');
 var filteredWordList = Object.keys(filteredComboWords);
 var wordList = Object.keys(comboWords);
 
-const TOTAL_WORDS_IN_SET = 20;
+var activeGameList = {};
 
+const TOTAL_WORDS_IN_SET = 100;
+const GAME_DURATION = 60 * 1000 + 2000; // Extra 2000ms
+const WORDS_LOADED_IN_ADVANCE = 3
+
+function truncateList(l, pointer) {
+  var upToCounter = Math.min(pointer + WORDS_LOADED_IN_ADVANCE, l.length);
+  var newList = [];
+  for (i = 0; i < upToCounter; i ++) {
+    newList.push(l[i]);
+    // remove the solution (more client side programming)
+    // newList.push([l[i][0], l[i][1]])
+  }
+  return newList;
+}
+
+function checkValidAnagram(word, wordSet) {
+  console.log(word, wordSet[2])
+  if (word == undefined) {
+    return false;
+  }
+
+  if (wordSet[2].split("").sort().join("") === word.split("").sort().join("")) {
+    if (Object.keys(fullDictionary).indexOf(word) > -1) {
+      return true;
+    }
+  }
+  return false;
+}
 
 function newGame(user, callback) {
 
+  // Create a new random Game
   var random = Math.random();
-  // it's fun time, let's make a new game!
-  // if (random < 0.5) {
-    randomGame = generateNewGame()
-    id = saveRandomGame(randomGame);
-    // store game
+  randomGame = generateNewGame()
+  id = saveRandomGame(randomGame);
+  addGameIDToUser(user, id)
 
-    game = {
-      game: randomGame,
-      id: id
+  // Create a random Game ID to be used between the server and the client
+  var gameToken = Math.random().toString(36).replace(/[^a-zA-Z0-9]+/g, '').substr(1, 21);
+  var gameTokenExpiry = Date.now() + GAME_DURATION;
+  
+  activeGameList[gameToken] = {};
+  activeGameList[gameToken].expiry = gameTokenExpiry;
+  activeGameList[gameToken].wordSet = randomGame;
+  activeGameList[gameToken].wordPointer = 0;
+
+  game = {
+    game: truncateList(randomGame, 0),
+    id: id,
+    gameToken: gameToken
+  }
+
+  return game;
+}
+
+function progressGame(user, gameToken, submittedWord) {
+  var currentTime = Date.now();
+  console.log(currentTime, gameToken, submittedWord);
+  if (Object.keys(activeGameList).indexOf(gameToken) > -1) {
+  // Game Exists
+    console.log('game found');
+    if (currentTime < activeGameList[gameToken].expiry) {
+      // Consistency Check with Server
+      console.log('time valid');
+      if (checkValidAnagram(submittedWord, activeGameList[gameToken].wordSet[activeGameList[gameToken].wordPointer])) {
+        activeGameList[gameToken].wordPointer ++;
+        game = {
+          game: truncateList(activeGameList[gameToken].wordSet, activeGameList[gameToken].wordPointer)
+        }
+        console.log('returning game', game)
+        return game
+      }
+      return {error_msg: "word check failed"}
     }
-    addGameIDToUser(user, id)
-    return game;
-  // } else {
-    // return getExistingGame(user);
-  // }
+    return {error_msg: "game clock off"}
+  }
+  return {error_msg: "game token invalid"}
 }
 
 function saveRandomGame(game) {
@@ -114,7 +172,8 @@ function addGameIDToUser(user, gameid) {
 
 module.exports = {
   newGame: newGame,
-  savedGame: savedGame
+  savedGame: savedGame,
+  progressGame: progressGame
 };
 
 // module.exports = {

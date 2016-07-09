@@ -8,10 +8,29 @@ router.get('/new', auth.loggedIn, function(req, res, next) {
   res.json(game.newGame(req.user));
 });
 
+router.get('/continue', auth.loggedIn, function(req, res, next) {
+  res.json(game.progressGame(req.user, req.query.gameToken, req.query.word));
+});
+
 router.get('/id/:id', auth.loggedIn, function(req, res, next) {
   game.savedGame(req.user, req.params.id, function(game) {
     res.json(game);
   })
 });
+
+
+router.post('/score', auth.loggedIn, function(req, res, next) {
+  game.postScore(req.user, req.body.gameToken, req.body.game_id, req.body.score, req.body.solvedWords, function(success) {
+    res.send(success);
+  });
+});
+
+router.get('/scores', function(req, res, next) {
+  game.getScores(req.user.id, function(scoreboard) {
+    res.send(scoreboard);
+  });
+});
+
+
 
 module.exports = router;

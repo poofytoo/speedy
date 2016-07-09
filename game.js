@@ -10,7 +10,7 @@ var wordList = Object.keys(comboWords);
 var activeGameList = {};
 
 const TOTAL_WORDS_IN_SET = 100;
-const GAME_DURATION = 60 * 1000 + 2000; // Extra 2000ms
+const GAME_DURATION = 60 * 1000 + 7000; // Extra 7000ms
 const WORDS_LOADED_IN_ADVANCE = 3
 
 function truncateList(l, pointer) {
@@ -25,12 +25,12 @@ function truncateList(l, pointer) {
 }
 
 function checkValidAnagram(word, wordSet) {
-  console.log(word, wordSet[2])
+  console.log(word, wordSet)
   if (word == undefined) {
     return false;
   }
 
-  if (wordSet[2].split("").sort().join("") === word.split("").sort().join("")) {
+  if (wordSet.split("").sort().join("") === word.split("").sort().join("")) {
     if (Object.keys(fullDictionary).indexOf(word) > -1) {
       return true;
     }
@@ -49,8 +49,12 @@ function newGame(user, callback) {
   // Create a random Game ID to be used between the server and the client
   var gameToken = Math.random().toString(36).replace(/[^a-zA-Z0-9]+/g, '').substr(1, 21);
   var gameTokenExpiry = Date.now() + GAME_DURATION;
-  
+
   activeGameList[gameToken] = {};
+
+  console.log('gameToken created: ', gameToken);
+  console.log('gameToken list:', activeGameList);
+
   activeGameList[gameToken].expiry = gameTokenExpiry;
   activeGameList[gameToken].wordSet = randomGame;
   activeGameList[gameToken].wordPointer = 0;
@@ -73,7 +77,7 @@ function progressGame(user, gameToken, submittedWord) {
     if (currentTime < activeGameList[gameToken].expiry) {
       // Consistency Check with Server
       console.log('time valid');
-      if (checkValidAnagram(submittedWord, activeGameList[gameToken].wordSet[activeGameList[gameToken].wordPointer])) {
+      if (checkValidAnagram(submittedWord, activeGameList[gameToken].wordSet[activeGameList[gameToken].wordPointer][2])) {
         activeGameList[gameToken].wordPointer ++;
         game = {
           game: truncateList(activeGameList[gameToken].wordSet, activeGameList[gameToken].wordPointer)
@@ -170,35 +174,69 @@ function addGameIDToUser(user, gameid) {
   })
 }
 
-
-// req.user, req.body.game_id, req.body.score
-
-function postScore(user, gameid, score, callback) {
-  var scoreRef = firebaseRef.ref('scores/' + user.id);
-
-  scoreRef.once("value", function(snapshot) {
-    if (snapshot.val() != null && parseInt(score) > snapshot.val().score) {
-      scoreRef.update({
-        score: parseInt(score),
-        game_id: gameid
-      }, function() {
-        callback({success: true});
-      })
-    } else if (snapshot.val() == null) {
-      scoreRef.set({
-        score: parseInt(score),
-        user: req.user.id,
-        game_id: gameid
-      }, function() {
-        callback({success: true});
-      });
-    } else {
-      callback({success: true});
+function validateSolvedWords(solvedWords, gameToken) {
+  wordSet = activeGameList[gameToken].wordSet
+  score = 0
+  for (i = 0; i < solvedWords.length; i ++) {
+    if (!checkValidAnagram(solvedWords[i], wordSet[i][2])) {
+      return false
     }
-  });
+    score += solvedWords[i].length - 2
+  }
+  return score
+}
 
-  var userScoreRef = firebaseRef.ref('users/'+user.id+'/games/'+gameid)
-  userScoreRef.set(score);
+function postScore(user, gameToken, gameid, score, solvedWords, callback) {
+  console.log('FULL ACTIVITY:', gameToken, gameid, score, solvedWords);
+
+  if (validateSolvedWords(solvedWords.split("_"), gameToken) == score) {
+    currentTime = Date.now();
+    console.log('time', currentTime, activeGameList[gameToken].expiry)
+    if (currentTime < activeGameList[gameToken].expiry) {
+
+      // This will guarantee the bot later to clean it up
+      activeGameList[gameToken].expiry -= 100000 
+      var scoreRef = firebaseRef.ref('scores/' + user.id);
+
+      // housekeeping, remove old games stored on server
+      for (gameToken in activeGameList) {
+        if (activeGameList[gameToken].expiry < currentTime) {
+          delete activeGameList[gameToken]
+        }
+      }
+
+      var userScoreRef = firebaseRef.ref('users/'+user.id+'/games/'+gameid)
+      userScoreRef.set(score);
+
+      scoreRef.once("value", function(snapshot) {
+        if (snapshot.val() != null && parseInt(score) > snapshot.val().score) {
+          scoreRef.update({
+            score: parseInt(score),
+            game_id: gameid
+          }, function() {
+            callback({success: true});
+          })
+        } else if (snapshot.val() == null) {
+          scoreRef.set({
+            score: parseInt(score),
+            user: req.user.id,
+            game_id: gameid
+          }, function() {
+            callback({success: true});
+          });
+        } else {
+          callback({success: true});
+        }
+      });
+
+    } else {
+      console.log('error failed server clock check');
+      callback({error_msg: 'failed server clock check'})
+    }
+  } else {
+    console.log('error failed word check');
+    callback({error_msg: 'failed word list check'})
+  }
 }
 
 function getScores(userID, callback) {
@@ -228,13 +266,3 @@ module.exports = {
   getScores: getScores
 };
 
-// module.exports = {
-//   newGame: function(user) {
-//     var random = Math.random();
-//
-//     // it's fun time, let's make a new game!
-//     if (random < 0.5) {
-//
-//     }
-//   }
-// };

@@ -20,7 +20,7 @@ router.get('/id/:id', auth.loggedIn, function(req, res, next) {
 
 
 router.post('/score', auth.loggedIn, function(req, res, next) {
-  game.postScore(req.user, req.body.game_id, req.body.score, function(success) {
+  game.postScore(req.user, req.body.gameToken, req.body.game_id, req.body.score, req.body.solvedWords, function(success) {
     res.send(success);
   });
 });

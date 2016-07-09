@@ -58,7 +58,12 @@ $(function() {
       confirmStartGame();
     }
     if (gameState == 'IN_GAME') {
-      if (e.which != 8) {
+      if (e.which == 13 || e.which == 32) {
+        // enter or space
+        for (i = 0; i < playerPlacematStack.length; i ++) {
+          setTimeout(removeLastLetter, 20*i)
+        }
+      } else if (e.which != 8) {
         char = String.fromCharCode(e.which).toLowerCase();
         moveLetterToPlayerPlacemat(char);
       } else {
@@ -335,7 +340,14 @@ $(function() {
 
     gameID = '';
 
-    $.post(GAME_POST_SCORE_URL, {score: score, game_id: currentGameID}, function() {
+    sendData = {score: score, 
+            gameToken: gameToken,
+            game_id: currentGameID, 
+            solvedWords: solvedWords.map(function(word) {
+              return word[2]
+            }).join("_")}
+
+    $.post(GAME_POST_SCORE_URL, sendData, function() {
       $.get(GAME_GET_SCORE_URL, function(data) {
         userGameScores = data.user.games;
         for (i in data.scores) {
@@ -461,10 +473,8 @@ $(function() {
       gameToken: gameToken,
       word: userWord
     }
-    console.log(data);
     $.get(CONTINUE_GAME_URL, data, function(data) {
       wordSet = data.game;
-      console.log('UPDATE!', wordSet);
     })
   }
 

@@ -159,7 +159,26 @@ function getLetterDifference(s1, l2) {
 function savedGame(user, id, callback) {
   gameRef = firebaseRef.ref('games/' + id);
   gameRef.once('value', function(data) {
-    game = {game: data.val(), id: id}
+
+      // Create a random Game ID to be used between the server and the client
+    var gameToken = Math.random().toString(36).replace(/[^a-zA-Z0-9]+/g, '').substr(1, 21);
+    var gameTokenExpiry = Date.now() + GAME_DURATION;
+
+    activeGameList[gameToken] = {};
+
+    console.log('gameToken created: ', gameToken);
+    console.log('gameToken list:', activeGameList);
+
+    activeGameList[gameToken].expiry = gameTokenExpiry;
+    activeGameList[gameToken].wordSet = data.val();
+    activeGameList[gameToken].wordPointer = 0;
+
+    game = {
+      game: truncateList(data.val(), 0),
+      id: id,
+      gameToken: gameToken
+    }
+
     addGameIDToUser(user, id)
     callback(game);
   })

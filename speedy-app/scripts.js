@@ -82,6 +82,7 @@ $(function() {
   function fetchGameByID(id, callback) {
     $.get('/game/id/' + id, function(data) {
       wordSet = data.game;
+      gameToken = data.gameToken;
       currentGameID = data.id;
       callback();
     });
